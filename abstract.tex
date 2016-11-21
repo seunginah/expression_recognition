@@ -1,0 +1,93 @@
+\documentclass[10pt,letterpaper]{article}
+\usepackage[top=0.75in,bottom=0.75in,left=1.0in,right=1.0in]{geometry}
+\usepackage{datetime}
+\usepackage{hyperref}
+
+\title{
+  \textbf{Mood and Expression Recognition} \\
+  \Large{CMPSCI 670, Fall 2016, UMass Amherst} \\
+  \author{Nagasravika Bodapati, Grace Yoo}
+}
+
+\date{}
+
+\begin{document}
+\maketitle
+
+\section{Objectives}
+For human interactions, an estimated $55\%$ of information is conveyed via emotional cues and the rest is through voice intonations and words used. Thus, using detection techniques to allow machines to recognize emotional states of humans may greatly improve human-computer interactions. For example, a machine might be trained to assess the quality of a lecture or a movie by reading the facial expressions of the audience; seeing many happy faces might suggest the event is interesting, while recognizing bored expressions might suggest the opposite.  \\
+
+\noindent Our objective is to build an expression recognition pipeline that can detect faces in images, extract features from them, and classify the mood or expression of the person. We will experiment with a variety of preprocessing, feature extraction, and modeling methods.
+
+\section{Data}
+There are generally 6 or 7 main emotions studied: angry, happy, sad, fear, disgust, surprise, and neutral. We think it would be interesting to see how the pipelines we implement perform on each of the following facial expression datasets:
+\begin{itemize}
+\item Cohn-Kanade AU-Coded Facial Expression Database \cite{cohn}
+\subitem 500 images from 100 individuals
+\subitem annotation of FACS action units and emotion-specified expressions
+\subitem only frontal images of faces posed to express: joy, surprise, anger, fear, disgust, and sadness
+\item MMI Facial Expression Database \cite{mmi}
+\subitem 2900 videos and high-resolution still images of 75 subjects
+\subitem subjects were posed to express: joy, surprise, anger, fear, disgust, and sadness
+\subitem subjects were also not posed
+\subitem fully annotated for the presence of AUs in videos (event coding)
+\item Ekman's Pictures of Facial Affect Database \cite{ekman} 
+\subitem 110 photographs
+\subitem faces of people from different ethnic backgrounds and time periods (ie Asians, stone age people)
+\end{itemize}
+
+\section{Approach}
+Our pipeline will include stages of image pre-processing, face detection, feature extraction, and expression/mood classification. To begin, we will both develop our own pipelines using different feature extraction methods and models. At each step, we'll compare results between our different methods. By the end of the project, we'll combine the best components of our pipelines to create our optimal expression recognition program. We will implement the code in Matlab and use existing packages like computer vision tool box or image processing toolbox as required.
+
+\subsection{Preprocessing}
+Pre-processing stage involves steps taken to make the classification invariant to scaling, translation or rotation:
+\subitem manual detection of eyes in the images 
+\subitem rescaling and cropping images to align eyes
+\subitem normalizing images to remove brightness effects, etc.
+
+\subsection{Face Detection}
+Face detection step is based on skin color and segmentation. We will use the face detector module of Matlab Computer Vision and the Haar cascade filter, etc.
+
+\subsection{Feature Extraction}
+After extracting features, each image will be represented as a vector:
+\subitem Euclidean distances of pixels from neutral images, Hedges, corners, facial feature points, Gabor features, NMF features, ICA features
+
+\subsection{Classification}
+\begin{itemize}
+\item dimensionality reduction to check or reduce computational complexity and overfitting:
+\subitem PCA, ICA
+\item train a classifier or ensemble: 
+\subitem Decision trees, KNN, Boosting, Bagging, Naive Bayes, Neural networks, ensemble 
+\item tune hyperparameters:
+\subitem grid search, random search with iterative random sampling cross-validation, k-fold cross validation
+\end{itemize}
+
+\section{Division of Work}
+Both of us will work on pre-processing and face detection together, until we are satisfied with our processed dataset. Then, we will split up the rest of the tasks evenly.\\
+
+\noindent Sravika's initial pipeline will include
+\subitem feature extraction: Gaber filters, corners, feature point detection through different techniques
+\subitem classifiers: decision trees, KNN, weighted KNN, ensemble of localized KNNs, boosting of classifiers \\
+
+\noindent Grace's initial pipeline will include
+\subitem feature extraction: NMF/local NMF, PCA filtered pixel intensities, Euclidean distances of pixel values, edges
+\subitem classifiers: SVM, Naive Bayes, bagging of classifiers, neural nets
+
+\
+\begin{thebibliography}{1}
+\bibitem{cohn} Cohn-Kanade AU-Coded Facial Expression Database \url{http://www.pitt.edu/~emotion/ck-spread.htm}
+\bibitem{mmi} MMI Facial Expression Database \url{http://mmifacedb.eu/}
+\bibitem{ekman} Pictures of Facial Affect \url{http://www.paulekman.com/product/pictures-of-facial-affect-pofa/}
+\end{thebibliography}
+
+\end{document}
+
+   
+
+Division of work:
+We intend to divide the work equally. Each picks a set of feature extraction techniques, classifiers to implement on the three datasets and finalize a pipeline that works well across all the three datasets. 
+
+Grace will work on will work on preprocessing, face detection, extracting features  Sravika will work on preprocessing, face detection, extracting features using gaber filters, corners, feature point detection through different techniques, classifiers like decision trees, knn, weighed knn, ensemble of localized knns, boosting of classifiers across the three databases etc.  
+ 
+
+
