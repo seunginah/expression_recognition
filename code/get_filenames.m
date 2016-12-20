@@ -14,5 +14,6 @@ function files = get_filenames(top_level)
     for i = find(valid_subdir)                 
         sub_dir = fullfile(top_level, sub_dirs{i});
         files = [files; get_filenames(sub_dir)];  
+        files = files(~contains(files, '.DS_Store'));  
     end
 end

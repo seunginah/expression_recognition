@@ -14,6 +14,10 @@ for i = 1:length(emotions)
     emotionIndexMap(i) = emotion;
 end
 
+emotionIndexMap = getEmotionIndexMap()
+
+% specify dataset folder: 'cohn-kanade' original, 'cohn-kanade-images' extended,
+ck_dataset = '../data/cohn-kanade-combined/'; 
 emotion_labels = get_filenames('../data/Emotion/');% text files w labels
 numOfFiles = length(emotion_labels);
 
@@ -23,14 +27,14 @@ numOfFiles = length(emotion_labels);
 %   labels [1 numOfFiles]
 
 % adjust ref_size to crop under the chin, and to the right of the ear
-crop_top = 100;
-crop_bottom = 400;
-crop_left = 100;
-crop_right = 550;
+% crop_top = 100;
+% crop_bottom = 400;
+% crop_left = 100;
+% crop_right = 550;
 
 % build cropped dataset, simulataneously reading labels
-croppedImages = zeros([crop_bottom - crop_top crop_right - crop_left n]);
-croppedImages, labels = align_cohn_ims('../data/training/');
+% croppedImages = zeros([crop_bottom - crop_top crop_right - crop_left n]);
+[croppedImages, labels] = align_cohn_ims(ck_dataset);
 
 %shuffle dataset
 if shuffle==1

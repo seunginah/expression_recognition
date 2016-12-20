@@ -1,16 +1,16 @@
-function raw_data, labels = align_cohn_ims(top_level)
+function [raw_data, labels] = align_cohn_ims(top_level)
 % input: dir top_level
 %   extract all subfiles as image
 %   align + resize
 % output: [H x W x D x N] dataset
+
+% image file
 im_paths = get_filenames(top_level);
 n = length(im_paths);
 
-% align all images to this one
-ref_im = imread('../data/training/neutral/S037_006_00000001.png');
-
 % text files w labels
 emotion_paths = get_filenames('../data/Emotion/'); 
+emotionIndexMap = getEmotionIndexMap()
 
 % select landmarks used for alignment
 lmark_paths = get_filenames('../data/Landmarks/'); 
@@ -21,6 +21,8 @@ lipL = 41; % bottom of left lip
 lipR = 47; % bottom of right lip
 chin = 4;
 
+% align all images to this one
+ref_im = imread('../data/training/neutral/S037_006_00000001.png');
 % extract landmarks from ref image
 ref_lmark_file = fopen('../data/Landmarks/S037/006/S037_006_00000001_landmarks.txt', 'r');
 ref_lmark = fscanf(ref_lmark_file, '%f', [2, 68])'; % [y coord, x coord]
@@ -35,12 +37,12 @@ crop_right = 550;
 % imshow(ref_crop)
 
 % build cropped dataset, simulataneously reading labels
-raw_data = zeros([crop_bottom - crop_top crop_right - crop_left n]);
-labels = zeros([1 n]);
+raw_data = zeros(crop_bottom - crop_top, crop_right - crop_left, n);
+labels = {};
 
 for i = 1:n    
     %%% read, align, crop image
-    im_path = im_paths{i};
+    im_path = im_paths{i}
     im = imread(im_path);
     im_size = size(im);
     % imshowpair(ref_im, im, 'montage');
@@ -52,10 +54,10 @@ for i = 1:n
     
     % use this to look up Landmarks or Emotion labels
     l = length(im_path);
-    im_name = im_path(l-4-16:l-4);
+    im_name = im_path(l-4-16:l-4)
     
     % get Landmarks files
-    lmark_path = lmark_paths{(contains(lmark_paths, im_name))};
+    lmark_path = lmark_paths{(contains(lmark_paths, im_name))}
     lmark_file = fopen(lmark_path, 'r');
     lmark = fscanf(lmark_file, '%f', [2, 68])';
     fclose(lmark_file);
@@ -81,14 +83,11 @@ for i = 1:n
         emo_file = fopen(emo_path, 'r');
         emotion_code = fscanf(emo_file, '%d');
         fprintf('emotioncode: %d\n', emotion_code);
-
-        % look up the emotion, add to label list
-        emotion = emotionIndexMap(emotion_code + 1);
         fclose(emo_file);
     else
-        emotion = 9;
+        emotion_code = 9;
     end
-    labels(i)=emotionIndexMap(emotion);
+    labels{i} = emotionIndexMap(emotion_code)
 end
 
 end
