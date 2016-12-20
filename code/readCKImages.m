@@ -4,7 +4,7 @@ function readCKImages()
 %Container map --dictionary with the above emotionTag-index
 %mapping
 shuffle=1;
-roi=0;
+roi=1;
 
 %emotions = {'neutral', 'anger', 'contempt', 'disgust', 'fear', 'happy', 'sadness', 'surprise', 'NA'};
 emotions = {'NE', 'AN', 'CO', 'DI', 'FE', 'HA', 'SA', 'SU', 'NA'};
@@ -14,8 +14,6 @@ for i = 1:length(emotions)
     emotionIndexMap(i) = emotion;
 end
 
-emotionIndexMap = getEmotionIndexMap()
-
 % specify dataset folder: 'cohn-kanade' original, 'cohn-kanade-images' extended,
 ck_dataset = '../data/cohn-kanade-combined/'; 
 emotion_labels = get_filenames('../data/Emotion/');% text files w labels
@@ -23,17 +21,9 @@ numOfFiles = length(emotion_labels);
 
 % Preprocessing
 % align the raw data 
-%   raw_data [width height numOfFiles] 
-%   labels [1 numOfFiles]
-
-% adjust ref_size to crop under the chin, and to the right of the ear
-% crop_top = 100;
-% crop_bottom = 400;
-% crop_left = 100;
-% crop_right = 550;
-
+%   croppedImages   [width height numOfFiles] 
+%   labels          cell array length numOfFiles
 % build cropped dataset, simulataneously reading labels
-% croppedImages = zeros([crop_bottom - crop_top crop_right - crop_left n]);
 [croppedImages, labels] = align_cohn_ims(ck_dataset);
 
 %shuffle dataset
@@ -44,7 +34,7 @@ if shuffle==1
 end
 
 original=croppedImages;
-if roi==1,
+if roi==1
     featureType='gabor_norm1';
     fprintf('+++Extracting ROI features...%s\n ',featureType);
     tic;
