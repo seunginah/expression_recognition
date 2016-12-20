@@ -41,6 +41,13 @@ function features=extractFeatures(images,featureType)
                     features=GaborFeatures_norm1(images);
                 case 'gabor_norm2'
                      features=GaborFeatures_norm2(images);
+                case 'gabor_v2'
+                    %combine with pca/adaboost for dimensionality reduction
+                    features=GaborFeatures_V2(images);
+                case 'gabor_v2_norm1'
+                    features=GaborFeatures_V2_norm1(images); 
+                case 'gabor_pixel_sharpen'
+                    features=GaborFeatures_V2_sharpen(images);
                 case 'soft_clustering'
                      features=SoftClustering(images);
                 case 'soft_clustering_norm1'
@@ -179,6 +186,54 @@ function features=SoftClustering_n2(images)
        features=features./sqrt(sum((features.^2+0.01),2));
 end
 
+    function features=GaborFeatures_V2_sharpen(images)
+             features1 = PixelFeatures_sharpened_n1(images);
+             features0=GaborFeatures_V2(images);
+             N1=size(features1,2);
+             N0=size(features0,2);
+             
+             features=zeros(size(images,3),N0+N1);
+             
+             for im_num =1:size(images,3)
+                 features(im_num,1:N0)=features0(im_num,:);
+                 features(im_num,N0+1:end)=features1(im_num,:);
+             end
+    end
+
+function features=GaborFeatures_V2(images)
+         wavelengths=[2,4,8]; %Try other options
+         orients=[0,45,90];%,135,180];
+         gaborBank=gabor(wavelengths,orients);
+         num_filters=length(wavelengths)*length(orients);
+         %num_features=size(images,1)*size(images,2)*1*num_filters;
+         num_features=ceil(1*size(images,1))*ceil(1*size(images,2))*1*num_filters;
+         features=zeros(size(images,3),num_features);
+         
+         for im_num=1:size(images,3)
+             im=images(:,:,im_num);
+             %disp(size(im));
+             im=imresize(im,1); 
+             %disp(size(im));
+             %figure;imshow(im/100);
+             [mag,phase]=imgaborfilt(im,gaborBank);
+             i=1;
+             %figure;
+             feats=[];
+             for p=1:num_filters
+                 mag_p=mag(:,:,p).';
+                 feats=[feats mag_p(:).'];
+              %  subplot(3,3,p);imshow(mag_p/100);
+             end
+             %disp(size(features)); disp(size(feats));
+             features(im_num,:)=feats; 
+         end
+end  
+
+function features=GaborFeatures_V2_norm1(images)
+       features=GaborFeatures_V2(images);
+       features=features./sqrt(sum((features.^2+0.01),2));
+end
+
 function features=GaborFeatures(images)
          wavelengths=[2,4,8]; %Try other options
          orients=[0,45,90];%,135,180];
@@ -194,7 +249,7 @@ function features=GaborFeatures(images)
              %figure;imshow(im/100);
              [mag,phase]=imgaborfilt(im,gaborBank);
              i=1;
-             figure;
+            % figure;
              for p=1:num_filters
                  mag_p=mag(:,:,p);
                  

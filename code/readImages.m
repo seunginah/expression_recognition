@@ -5,15 +5,14 @@ function readImages()
          %mapping        
          %To leverage the Matlab Dimensionality Reduction Toolbox 
          %Downloaded teh following package and added it to the path.
-         addpath(genpath('./drtoolbox'));
-         addpath(genpath('./DOC'));
+         %addpath(genpath('./drtoolbox'));     
          
          %variables to set.
          shuffle=1;
          fprintf('shuffling or no:%d\n ',shuffle);
          roi=0;
          %only one of the following to be true.
-         pca_decomposition=0;
+         pca_decomposition=1;
          nmf_decomposition=0;
          drtoolbox_decomp=0;
          
@@ -70,7 +69,7 @@ function readImages()
             fprintf('Time to extract ROI features %.2f\n',toc);
          else    
             %Extract features.
-            featureType='';         
+            featureType='gabor_pixel_sharpen';         
             fprintf('+++Extracting full image features...%s\n ',featureType);
             tic;
             images=extractFeatures(croppedImages,featureType); 
@@ -105,7 +104,7 @@ function readImages()
          testLabels=labels(numTrain+1:numOfFiles);
          
          %TRain and test DecisionTree
-         trainTestHCRF(trainSet,testSet,trainLabels,testLabels);
+         %trainTestAdaBoost(trainSet,testSet,trainLabels,testLabels);
          trainTestDT(trainSet,testSet,trainLabels,testLabels);
          trainTestKnn(trainSet,testSet,trainLabels,testLabels);
          clusterTEmplateMatch(original,trainSet,testSet,trainLabels,testLabels); 

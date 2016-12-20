@@ -4,10 +4,10 @@ function images=pca_decomp(images)
          %each element of column weight for corresponding eigen vector.
         
          %images here is a NxP shape, transpose.
-         N=size(images,2);
+         %N=size(images,2);
          fprintf('Original number of features:\n'); disp(size(images));
        
-         im=pca(images,'NumComponents',200);%,'NumComponents',floor(num_comp*N));
+         im=pca(images,'NumComponents',50);%,'NumComponents',floor(num_comp*N));
          images=images*im;
          fprintf('Final number of features:\n ');disp(size(images));
 end
