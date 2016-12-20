@@ -5,14 +5,7 @@ function readCKImages()
 %mapping
 shuffle=1;
 roi=1;
-
-%emotions = {'neutral', 'anger', 'contempt', 'disgust', 'fear', 'happy', 'sadness', 'surprise', 'NA'};
-emotions = {'NE', 'AN', 'CO', 'DI', 'FE', 'HA', 'SA', 'SU', 'NA'};
-emotionIndexMap=containers.Map('KeyType', 'int32', 'ValueType', 'any');
-for i = 1:length(emotions)
-    emotion = emotions{i};
-    emotionIndexMap(i) = emotion;
-end
+emotionIndexMap = getEmotionIndexMap();
 
 % specify dataset folder: 'cohn-kanade' original, 'cohn-kanade-images' extended,
 ck_dataset = '../data/cohn-kanade-combined/'; 
@@ -34,7 +27,7 @@ if shuffle==1
 end
 
 original=croppedImages;
-if roi==1
+if roi==1,
     featureType='gabor_norm1';
     fprintf('+++Extracting ROI features...%s\n ',featureType);
     tic;

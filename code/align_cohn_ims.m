@@ -10,6 +10,7 @@ n = length(im_paths);
 
 % text files w labels
 emotion_paths = get_filenames('../data/Emotion/'); 
+emotionIndexMap = getEmotionIndexMap();
 
 % select landmarks used for alignment
 lmark_paths = get_filenames('../data/Landmarks/'); 
@@ -81,7 +82,7 @@ for i = 1:n
         emo_path = emotion_paths{(contains(emotion_paths, im_name))};
         emo_file = fopen(emo_path, 'r');
         emotion_code = fscanf(emo_file, '%d');
-        fprintf('image: %s emotion: %d\n', im_name, emotion_code);
+        fprintf('(%d/%d) name: %s, emotion: %d\n', i, n, im_name, emotion_code);
         fclose(emo_file);
     else
         emotion_code = 9;
