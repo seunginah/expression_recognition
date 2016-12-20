@@ -1,5 +1,6 @@
-% options
-% 'cohn-kanade' original, 'cohn-kanade-images' extended,
+% from the raw data, organize images into folders by emotion
+
+% specify dataset folder: 'cohn-kanade' original, 'cohn-kanade-images' extended,
 ck_dataset = 'cohn-kanade-combined'; 
 
 % 1. create training data
@@ -18,7 +19,7 @@ for i = 1:length(emotions)
 end
 
 top_level_dir = '../data/Emotion/'; % text files w labels
-emotion_labels = get_filenames(top_level_dir); 
+emotion_labels = get_filenames(top_level_dir);
 labeled_images = {};
 for i = 1:length(emotion_labels)
     % open file, extract emotion code
