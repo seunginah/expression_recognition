@@ -22,7 +22,7 @@ lipR = 47; % bottom of right lip
 chin = 4;
 
 % align all images to this one
-ref_im = imread('../data/training/neutral/S037_006_00000001.png');
+ref_im = imread('../data/cohn-kanade-combined/S037/006/S037_006_00000001.png');
 % extract landmarks from ref image
 ref_lmark_file = fopen('../data/Landmarks/S037/006/S037_006_00000001_landmarks.txt', 'r');
 ref_lmark = fscanf(ref_lmark_file, '%f', [2, 68])'; % [y coord, x coord]
@@ -38,14 +38,13 @@ crop_right = 550;
 
 % build cropped dataset, simulataneously reading labels
 raw_data = zeros(crop_bottom - crop_top, crop_right - crop_left, n);
-labels = {};
+labels = cell(n);
 
-for i = 1:n    
+for i = 1:n   
     %%% read, align, crop image
     im_path = im_paths{i};
     im = imread(im_path);
     im_size = size(im);
-    % imshowpair(ref_im, im, 'montage');
     
     % if color image, remap to b & w
     if length(im_size) == 3
@@ -73,7 +72,7 @@ for i = 1:n
     
     % crop excess from bottom and right side
     im_crop = im_align(crop_top+1:crop_bottom, crop_left+1:crop_right);
-    %imshowpair(ref_im, im_crop);
+    % imshowpair(im_crop, im, 'montage');
     raw_data(:, :, i) = im_crop;
     
     %%% SEARCH FOR LABEL

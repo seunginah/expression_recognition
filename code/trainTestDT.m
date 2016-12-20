@@ -4,7 +4,12 @@ function trainTestDT(x_train,x_test,y_train,y_test)
           ypred=predict(model,x_test);
           
           ypred=ypred.';
-          fprintf('Accuracy of decision tree on test set:%.2f\n',mean(ypred==y_test));
+          
+          if ~all(size(ypred) == size(y_test))
+              y_test = y_test.';
+          end
+          
+          fprintf('Accuracy of decision tree on test set:%.2f\n', sum(mean(ypred==y_test)));
           
           fprintf('++++++++++Prune tree based on least cvloss...\n'); 
           [~,~,~,bestlevel] = cvLoss(model,...
@@ -14,5 +19,6 @@ function trainTestDT(x_train,x_test,y_train,y_test)
           model = prune(model,'Level',bestlevel);
           ypred=predict(model,x_test);
           ypred=ypred.';
-          fprintf('Accuracy after pruning on test set:%.2f\n',mean(ypred==y_test));
+          
+          fprintf('Accuracy after pruning on test set:%.2f\n', sum(mean(ypred==y_test)));
 end
