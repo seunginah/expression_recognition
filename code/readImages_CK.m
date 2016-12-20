@@ -6,7 +6,6 @@ function readImages()
          %To leverage the Matlab Dimensionality Reduction Toolbox 
          %Downloaded teh following package and added it to the path.
          addpath(genpath('./drtoolbox'));
-         addpath(genpath('./DOC'));
          
          %variables to set.
          shuffle=1;
@@ -16,7 +15,7 @@ function readImages()
          pca_decomposition=0;
          nmf_decomposition=0;
          drtoolbox_decomp=0;
-         
+         %{
          emotionIndexMap=containers.Map;
          emotionIndexMap('AN')=1;
          emotionIndexMap('DI')=2;
@@ -25,33 +24,36 @@ function readImages()
          emotionIndexMap('NE')=5;
          emotionIndexMap('SA')=6;
          emotionIndexMap('SU')=7;
-         
-         filepath='jaffe\';
-         fileList=ls(strcat(filepath,'*.tiff'));
+         %}
+         filepath='CohnKanade\';
+         fileList=ls(strcat(filepath,'*.png'));
          numOfFiles=length(fileList);
-         imageWidth=size(imread(fullfile('jaffe\',fileList(1,:))),2);
-         imageHeight=size(imread(fullfile('jaffe\',fileList(1,:))),1);
+         imageWidth=size(imread(fullfile('CohnKanade\',fileList(1,:))),2);
+         imageHeight=size(imread(fullfile('CohnKanade\',fileList(1,:))),1);
          
          %Constants
-         r1=90; r2=109; 
-         c1=70;c2=59;
+         r1=173; r2=173; 
+         c1=170;c2=170;
          resize_factor=0.9;
-         croppedImHeight=(r1+r2+1)*0.9;%180;
-         croppedImWidth=(c1+c2+1)*0.9;%117;   
+         croppedImHeight=ceil((r1+r2+1)*0.9);%313;
+         croppedImWidth=ceil((c1+c2+1)*0.9);%325;   
          
          images=zeros(imageHeight,imageWidth,numOfFiles);
-         croppedImages=zeros(croppedImHeight,croppedImWidth,numOfFiles);
+         %croppedImages=zeros(imageHeight*0.5,imageWidth*0.5,numOfFiles);
+         croppedImages=zeros(croppedImWidth,croppedImHeight,numOfFiles);
          labels=zeros(1,numOfFiles);
          
          %Preprocessing
          for i=1:numOfFiles
-             labels(i)=emotionIndexMap(fileList(i,4:5));
-             images(:,:,i)=imread(fullfile(filepath,fileList(i,:)));            
-             croppedImages(:,:,i)=imresize(images(128-r1:128+r2,128-c1:128+c2,i),resize_factor);
+             labels(i)=str2num(fileList(i,8:8));
+             images(:,:,i)=imread(fullfile(filepath,fileList(i,:)));  
+             %images(:,:,i)=histeq(images(:,:,i));
+             %croppedImages(:,:,i)=imresize(images(:,:,i),0.5);
+             croppedImages(:,:,i)=imresize(images(252-c1:252+c2,372-r1:372+r2,i),resize_factor);
                       
          end
          %imtool(croppedImages(:,:,213)/100);
-         
+       
          %shuffle dataset
          if shuffle==1
             ix=randperm(numOfFiles);
@@ -66,14 +68,14 @@ function readImages()
             featureType='lbp2';         
             fprintf('+++Extracting ROI features...%s\n ',featureType);
             tic;
-            images=extractFeaturesROI(croppedImages,featureType); 
+            images=extractFeaturesROI_CK(croppedImages,featureType); 
             fprintf('Time to extract ROI features %.2f\n',toc);
          else    
             %Extract features.
-            featureType='';         
+            featureType='gabor_norm1';         
             fprintf('+++Extracting full image features...%s\n ',featureType);
             tic;
-            images=extractFeatures(croppedImages,featureType); 
+            images=extractFeatures_CK(croppedImages,featureType); 
             fprintf('Time to extract full features %.2f\n',toc);
          end
          
@@ -105,7 +107,6 @@ function readImages()
          testLabels=labels(numTrain+1:numOfFiles);
          
          %TRain and test DecisionTree
-         trainTestHCRF(trainSet,testSet,trainLabels,testLabels);
          trainTestDT(trainSet,testSet,trainLabels,testLabels);
          trainTestKnn(trainSet,testSet,trainLabels,testLabels);
          clusterTEmplateMatch(original,trainSet,testSet,trainLabels,testLabels); 

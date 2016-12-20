@@ -41,6 +41,6 @@ function clusterTEmplateMatch(original,x_train,x_test,y_train,y_test)
             label=label.';
             fprintf('Accuracy of template matching on test set:%.2f\n',mean(label==y_test));
             %disp(score);
-            disp(label);
-            disp(y_test);
+            %disp(label);
+            %disp(y_test);
 end

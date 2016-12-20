@@ -1,4 +1,4 @@
-function features=extractFeatures(images,featureType)
+function features=extractFeatures_CK(images,featureType)
          %Input images is of the form imageHeight,imageWidth,numImages 
          %256x256x213-- for jaffe dataset;
       
@@ -49,18 +49,17 @@ function features=extractFeatures(images,featureType)
                      features=SoftClustering_n2(images);
                 case 'edge_features'
                      features=EdgeFeatures(images);
-                case 'edge_features_norm1'
+                case 'edge_features_n1'
                      features=EdgeFeatures_norm1(images);
-                case 'edge_features_norm2'
+                case 'edge_features_n2'
                      features=EdgeFeatures_norm2(images);
                 case 'fiducial_points'
                     features=FiducialPoints(images);
-                case 'fiducial_points_norm1'
-                    features=FiducialPoints_norm1(images);
+                case 'fiducial_points_n1'
+                    features=FiducialPoints_norm1(images);    
                      
-         end  
-         
-         
+         end
+
          
 function features=FiducialPoints(images)
          fid_x=[43,52,56,59,63,65,63,73,30,56,82,109,19,25,34,40,44,50,52,78,82,84,82,77,73,...
@@ -194,7 +193,7 @@ function features=GaborFeatures(images)
              %figure;imshow(im/100);
              [mag,phase]=imgaborfilt(im,gaborBank);
              i=1;
-             figure;
+             %figure;
              for p=1:num_filters
                  mag_p=mag(:,:,p);
                  
