@@ -8,13 +8,13 @@ roi=1;
 emotionIndexMap = getEmotionIndexMap();
 
 % specify dataset folder: 'cohn-kanade' original, 'cohn-kanade-images' extended,
-ck_dataset = '../data/cohn-kanade-combined/'; 
+ck_dataset = '../data/cohn-kanade-combined/';
 emotion_labels = get_filenames('../data/Emotion/');% text files w labels
 numOfFiles = length(emotion_labels);
 
 % Preprocessing
-% align the raw data 
-%   croppedImages   [width height numOfFiles] 
+% align the raw data
+%   croppedImages   [width height numOfFiles]
 %   labels          cell array length numOfFiles
 % build cropped dataset, simulataneously reading labels
 [croppedImages, labels] = align_cohn_ims(ck_dataset);
@@ -42,8 +42,25 @@ else
     fprintf('Time to extract full features %.2f\n',toc);
 end
 
+%Pca decomposition.
+if pca_decomposition==1,
+    images=pca_decomp(images); %If a float value, percent of features to retain.
+end
+
+%NNMF decomposition.
+if nmf_decomposition==1,
+    images=nnmf_decomp(images); %If a float value, percent of features to retain.
+end
+
+if drtoolbox_decomp==1,
+    method='tSNE';
+    images=drtoolbox_decomposition(images,labels,method);
+end
+
+
 %Break into 80-20%
 numTrain=floor(0.8*numOfFiles);
+fprintf('Num_train(%d) Num_test(%d)\n',numTrain,size(images,1)-numTrain);
 trainSet=zeros(size(images,1),numTrain);
 testSet=zeros(size(images,1),(numOfFiles-numTrain));
 
@@ -54,8 +71,11 @@ trainLabels=labels(1:numTrain);
 testLabels=labels(numTrain+1:numOfFiles);
 
 %TRain and test DecisionTree
+%trainTestAdaBoost(trainSet,testSet,trainLabels,testLabels);
 trainTestDT(trainSet,testSet,trainLabels,testLabels);
 trainTestKnn(trainSet,testSet,trainLabels,testLabels);
 clusterTEmplateMatch(original,trainSet,testSet,trainLabels,testLabels);
 trainTestSVM(trainSet,testSet,trainLabels,testLabels);
+trainTestNeuralNet(trainSet,testSet,trainLabels,testLabels);
+ensembleNeuralNet(trainSet,testSet,trainLabels,testLabels);
 end
