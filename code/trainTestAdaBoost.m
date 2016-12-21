@@ -47,5 +47,34 @@ end
 
 %% for for cohn-kanade images
 function ck(x_train, x_test, y_train, y_test)
+t = templateTree('MaxNumSplits',5);
+
+model = fitcensemble(x_train,y_train,'Method','AdaBoostM2','Learners',t,'CrossVal','on');
+ypred = cellstr(predict(model, x_train));
+accuracy = sum(strcmp(ypred, y_train.') / length(ypred)); 
+fprintf('Accuracy of AdaboostM2 on train set: %.2f\n', accuracy);
+
+ypred = cellstr(predict(model, x_test));
+accuracy = sum(strcmp(ypred, y_test.') / length(ypred));
+fprintf('Accuracy of AdaboostM2 on test set: %.2f\n', accuracy);
+
+model = fitcensemble(x_train,y_train,'Method','RUSBoost','Learners',t,'CrossVal','on');
+ypred = cellstr(predict(model, x_train));
+accuracy = sum(strcmp(ypred, y_train.') / length(ypred)); 
+fprintf('Accuracy of RUSBoost on train set: %.2f\n', accuracy);
+
+ypred = cellstr(predict(model, x_test));
+accuracy = sum(strcmp(ypred, y_test.') / length(ypred));
+fprintf('Accuracy of RUSBoost on test set: %.2f\n', accuracy);
+
+model = fitcensemble(x_train,y_train,'Method','Bag','Learners',t,'CrossVal','on');
+ypred = cellstr(predict(model, x_train));
+accuracy = sum(strcmp(ypred, y_train.') / length(ypred)); 
+fprintf('Accuracy of Bagging on train set: %.2f\n', accuracy);
+
+ypred = cellstr(predict(model, x_test));
+accuracy = sum(strcmp(ypred, y_test.') / length(ypred));
+fprintf('Accuracy of Bagging on test set: %.2f\n', accuracy);
+
 
 end

@@ -55,4 +55,41 @@ end
 
 %% for for cohn-kanade images
 function [trainIndices, testIndices] = ck(x_train, x_test, y_train, y_test, input)
+
+rng(0);
+if nargin<5
+    input=[50,10];
+end
+
+% alist of n inputs, n+1 layers created
+net = patternnet(input,'trainscg','crossentropy');
+
+x_train = x_train.';
+x_test = x_test.';
+
+%Build t of shape [num_target_classes,num_samples]
+t=zeros(7,size(x_train,2));
+emotions = {'NE', 'AN', 'CO', 'DI', 'FE', 'HA', 'SA', 'SU', 'NA'};
+
+for row = 1:length(emotions)
+    emotion = emotions{row};
+    % idxes where y_train == emotion
+    emotion_idxs = contains(y_train, emotion);
+    t(row, emotion_idxs) = 1;
+end
+
+[net, tr] = train(net,x_train,t);
+
+pred_y=net(x_train);
+trainIndices = vec2ind(pred_y);
+ypred = cellstr(emotions(trainIndices));
+accuracy = sum(strcmp(ypred.', y_train.') / length(ypred)); 
+fprintf('train set accuracy: %.2f\n', accuracy);
+
+pred_y = net(x_test);
+testIndices = vec2ind(pred_y);
+ypred = cellstr(emotions(testIndices));
+accuracy = sum(strcmp(ypred.', y_test.') / length(ypred)); 
+fprintf('test set accuracy: %.2f\n', accuracy);
+
 end

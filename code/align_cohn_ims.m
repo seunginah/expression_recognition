@@ -9,12 +9,12 @@ im_paths = get_filenames(top_level);
 n = length(im_paths);
 
 % text files w labels
-emotion_paths = get_filenames('../data/Emotion/'); 
+emotion_paths = get_filenames('../data/Emotion/');
 emotionIndexMap = getEmotionIndexMap();
 
 % select landmarks used for alignment
-lmark_paths = get_filenames('../data/Landmarks/'); 
-% each landmark file has 68 entries 
+lmark_paths = get_filenames('../data/Landmarks/');
+% each landmark file has 68 entries
 eyeL = 14; % top left eyebrow
 eyeR = 8; % top right eyebrow
 lipL = 41; % bottom of left lip
@@ -37,10 +37,10 @@ crop_right = 550;
 % imshow(ref_crop)
 
 % build cropped dataset, simulataneously reading labels
-raw_data = zeros(crop_bottom - crop_top, crop_right - crop_left, n);
-labels = {};
-
-for i = 1:n    
+raw_data = zeros(crop_bottom - crop_top, crop_right - crop_left, length(emotion_paths));
+labels = cell(length(emotion_paths));
+label_count = 0;
+for i = 1:n
     %%% read, align, crop image
     im_path = im_paths{i};
     im = imread(im_path);
@@ -56,38 +56,39 @@ for i = 1:n
     l = length(im_path);
     im_name = im_path(l-4-16:l-4);
     
-    % get Landmarks files
-    lmark_path = lmark_paths{(contains(lmark_paths, im_name))};
-    lmark_file = fopen(lmark_path, 'r');
-    lmark = fscanf(lmark_file, '%f', [2, 68])';
-    fclose(lmark_file);
-    
-    % use landmarks to estimate transformation
-    % you can use any subset of the landmarks-better alignment than full set
-    cpts = [eyeL eyeR chin];
-    ref_cpts = ref_lmark(cpts, :);
-    im_cpts = lmark(cpts, :);
-    
-    est_trans = fitgeotrans(im_cpts, ref_cpts, 'similarity');
-    im_align = imwarp(im, est_trans, 'OutputView', imref2d(size(im)));
-    
-    % crop excess from bottom and right side
-    im_crop = im_align(crop_top+1:crop_bottom, crop_left+1:crop_right);
-    %imshowpair(ref_im, im_crop);
-    raw_data(:, :, i) = im_crop;
-    
     %%% SEARCH FOR LABEL
     % if no label found - class 'NA'
     if any(contains(emotion_paths, im_name))
+        label_count = label_count + 1;
+        % get Landmarks files
+        lmark_path = lmark_paths{(contains(lmark_paths, im_name))};
+        lmark_file = fopen(lmark_path, 'r');
+        lmark = fscanf(lmark_file, '%f', [2, 68])';
+        fclose(lmark_file);
+        
+        % use landmarks to estimate transformation
+        % you can use any subset of the landmarks-better alignment than full set
+        cpts = [eyeL eyeR chin];
+        ref_cpts = ref_lmark(cpts, :);
+        im_cpts = lmark(cpts, :);
+        
+        est_trans = fitgeotrans(im_cpts, ref_cpts, 'similarity');
+        im_align = imwarp(im, est_trans, 'OutputView', imref2d(size(im)));
+        
+        % crop excess from bottom and right side
+        im_crop = im_align(crop_top+1:crop_bottom, crop_left+1:crop_right);
+        %imshowpair(ref_im, im_crop);
+        raw_data(:, :, label_count) = im_crop;
+        
+        % get label
         emo_path = emotion_paths{(contains(emotion_paths, im_name))};
         emo_file = fopen(emo_path, 'r');
         emotion_code = fscanf(emo_file, '%d');
         fprintf('(%d/%d) name: %s, emotion: %d\n', i, n, im_name, emotion_code);
         fclose(emo_file);
-    else
-        emotion_code = 9;
+        
+        labels{label_count} = emotionIndexMap(emotion_code);
     end
-    labels{i} = emotionIndexMap(emotion_code);
 end
 
 end
