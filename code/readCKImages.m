@@ -3,8 +3,19 @@
 function readCKImages()
 %Container map --dictionary with the above emotionTag-index
 %mapping
+%To leverage the Matlab Dimensionality Reduction Toolbox
+%Downloaded teh following package and added it to the path.
+%addpath(genpath('./drtoolbox'));
+
+%variables to set.
 shuffle=1;
-roi=1;
+fprintf('shuffling or no:%d\n ',shuffle);
+roi=0;
+%only one of the following to be true.
+pca_decomposition=1;
+nmf_decomposition=0;
+drtoolbox_decomp=0;
+
 emotionIndexMap = getEmotionIndexMap();
 
 % specify dataset folder: 'cohn-kanade' original, 'cohn-kanade-images' extended,
