@@ -1,0 +1,186 @@
+	\documentclass[10pt,twocolumn,letterpaper]{article}
+
+\usepackage{cvpr}
+\usepackage{times}
+\usepackage{epsfig}
+\usepackage{graphicx}
+\usepackage{amsmath}
+\usepackage{amssymb}
+% Include other packages here, before hyperref.
+\usepackage{hyperref}
+
+\cvprfinalcopy % *** Uncomment this line for the final submission
+\def\cvprPaperID{****} % *** Enter the CVPR Paper ID here
+\def\httilde{\mbox{\tt\raisebox{-.5ex}{\symbol{126}}}}
+% Pages are numbered in submission mode, and unnumbered in camera-ready
+\ifcvprfinal\pagestyle{empty}\fi
+
+% graphics pull from this folders
+\graphicspath{{../figs/}}
+
+\begin{document}
+\title{Expression Recognition}
+
+\author{Nagasravika Bodapati \& Grace Yoo \\ 
+University of Massachusetts Amherst \\ 
+College of Information \& Computer Sciences \\
+{\tt\small \{gyoo, nbodapati\}@cs.umass.edu} \\
+}
+
+\maketitle
+
+\section{Abstract} 
+% no more than 300 words
+For human interactions, an estimated $55\%$ of information is conveyed via emotional cues and the rest is through voice intonations and words used. Thus, using detection techniques to allow machines to recognize emotional states of humans may greatly improve human-computer interactions. For example, a machine might be trained to assess the quality of a lecture or a movie by reading the facial expressions of the audience; seeing many happy faces might suggest the event is interesting, while recognizing bored expressions might suggest the opposite.  \\
+
+\noindent Our objective is to build an expression recognition pipeline that can detect faces in images, extract features from them, and classify the mood or expression of the person. We will experiment with a variety of preprocessing, feature extraction, and modeling methods.
+
+\section{Introduction}
+% Introduction: this section introduces facial expression recognition in general
+
+The domain of facial expression recognition has been shaped greatly by psychological research on emotional states. 
+
+
+Later, Tomkins recruited Paul Ekman and Carroll Izard to conduct what is known today as the “universality studies.” The first of these demonstrated high cross-cultural agreement in judgments of emotions in faces by people in both literate (Ekman, 1972, 1973; Ekman & Friesen, 1971; Ekman, Sorenson, & Friesen, 1969; Izard, 1971) and preliterate cultures (Ekman & Friesen, 1971; Ekman, et al., 1969). Then Friesen’s (1972) study documented that the same facial expressions of emotion were produced spontaneously by members of very different cultures in reaction to emotion-eliciting films.
+Since the original universality studies more than 30 studies examining judgments of facial expressions have replicated the universal recognition of emotion in the face (reviewed in Matsumoto, 2001). In addition a meta-analysis of 168 datasets examining judgments of emotion in the face and other nonverbal stimuli indicated universal emotion recognition well above chance levels (Elfenbein & Ambady, 2002a). And there have been over 75 studies that have demonstrated that these very same facial expressions are produced when emotions are elicited spontaneously (Matsumoto, Keltner, Shiota, Frank, & O'Sullivan, 2008). These findings are impressive given that they have been produced by different researchers around the world in different laboratories using different methodologies with participants from many different cultures but all converging on the same set of results. Thus there is strong evidence for the universal facial expressions of seven emotions – anger, contempt, disgust, fear, joy, sadness, and surprise (see Figure 1).
+
+\section{Related Work} 
+% This section discusses relevant literature for your project
+Since our project domain was so broad, we 
+
+\subsection{Data Processing Techniques}
+% previous study comparing ROI vs full face
+
+\subsection{Feature Extraction Techniques}
+% previous studies for:
+% 'pixel', 'pixel_sharpen', 'pixel_gradient'
+
+% 'hog'
+
+% 'lbp' 
+
+% 'gabor'
+
+% 'soft_clustering', 
+
+% 'edge_features' 
+
+% 'fiducial_points'
+
+\subsection{Models}
+% give a good example of each, express expectations we have for our results
+
+% decision tree
+
+% KNN
+
+% SVM
+
+% adaboost
+
+% cluster template matching
+
+% HCRF
+
+% neural nets, ensemble
+
+\section{Approach}
+% Approach: This section details the framework of your project. Be specific, which means you might want to include equations, figures, plots, etc
+We wanted to understand, at a high level, what combinations of pre-processing, feature extraction, dimensionality reduction, and modeling techniques result in the best expression classifiers. Our approach was to build a pipeline with a variety of modular feature extraction and modeling functions, such that we could easily try many models. We took the most promising models and tuned them.
+
+Cross-database evaluation via same experiments on using diff image sets
+
+%TODO : add all external packages here + then cite them
+Our implementation is written in Matlab, and requires the Image Processing, Fuzzy Logic, and the Neural Networks Toolbox. External packages include 
+
+\subsection{Preprocessing}
+aligning images using "similarity" transformation and landmarks, 
+cropping
+% show result of align + crop for both datasets
+
+finding regions of interest
+% show result of ROI
+
+%Pre-processing stage involves steps taken to make the classification invariant to scaling, translation or rotation:
+%\subitem manual detection of eyes in the images 
+%\subitem rescaling and cropping images to align eyes
+%\subitem normalizing images to remove brightness effects, etc.
+
+\subsection{Feature Extraction}
+%  'pixel', 'pixel_norm1', 'pixel_norm2', 'pixel_sharpen', 'pixel_sharpen_norm1', 'pixel_sharpen_norm2',
+%  'pixel_gradient', 'pixel_gradient_norm1', 'pixel_gradient_norm2', 'hog', 'hog_norm1', 'hog_norm2', 
+%  'lbp', 'lbp_norm1', 'lbp_norm2', 'lbp2', 'gabor', 'gabor_norm1', 'gabor_norm2', 'soft_clustering', 
+% 'soft_clustering_norm1', 'soft_clustering_norm2', 'edge_features', 'edge_features_n1', 
+% 'edge_features_n2', 'fiducial_points', 'fiducial_points_n1'
+
+\subsection{Classification}
+\begin{itemize}
+\item dimensionality reduction to check or reduce computational complexity and overfitting:
+\subitem PCA, ICA
+\item train a classifier or ensemble: 
+\subitem Decision trees, KNN, Boosting, Bagging, Naive Bayes, Neural networks, ensemble 
+\item tune hyperparameters:
+\subitem grid search, random search with iterative random sampling cross-validation, k-fold cross validation
+\end{itemize}
+
+\section{Experiments} 
+% This section begins with what kind of experiments you're doing, what kind of dataset(s) you're using, and what is the way you measure or evaluate your results. It then shows in details the results of your experiments. By details, we mean both quantitative evaluations (show numbers, figures, tables, etc) as well as qualitative results (show images, example results, etc).
+
+\subsection{Data}
+There are generally 6 or 7 main emotions studied: angry, happy, sad, fear, disgust, surprise, and neutral. We think it would be interesting to see how the pipelines we implement perform on each of the following facial expression datasets:
+\begin{itemize}
+\item Cohn-Kanade AU-Coded Facial Expression Database \cite{ck}
+\subitem 500 images from 100 individuals
+\subitem annotation of FACS action units and emotion-specified expressions
+\subitem only frontal images of faces posed to express: joy, surprise, anger, fear, disgust, and sadness
+\end{itemize}
+
+
+We used the CIFAR-10 dataset, which consists of $60,000$ images evenly distributed into 10 classes (airplane, automobile, bird, cat, deer, dog, frog, horse, ship, truck). Each $32 \times 32 \times 3$ pixel image is represented by the RGB color model, so it has 3 channels. We will remove a $16 \times 16$ region of each image, and consider the original image to be the original distribution of $32 \times 32 \times 3 = 3,072$ dimensions. All images have normalized pixel intensities. \\
+
+This is what our incomplete images look like after we remove the center pixels.\\
+%\includegraphics[width=1.0\linewidth]{img_sample.png}
+
+
+
+\subsection{Setup}
+%% how much in train and test set
+%% what combinations of processing, feature extraction, etc were applied and what reasoning?
+%% what combinations were avoided?
+
+\subsection{Results}
+Table 1 shows the RMSE values for the models, as well as the number of samples deemed to be convincing by human judges. If the entry in the table is not filled, it means that our model never finished training to the point where we could generate samples.
+\begin{table}[!ht]
+\centering
+\caption{Each of 3 human judges saw 10 samples each, totaling 30 total samples for each model}
+\begin{tabular}{lll}
+\hline
+Model               & Test RMSE & \# Convincing samples \\ \hline
+CNN with Regression & 24.468    &  4                     \\
+Pixel RNN w Sigmoid &   -       &  -                     \\
+Pixel RNN w Softmax &   -       &  10                     \\
+Pixel CNN           &   -       &  -                     \\ \hline
+\end{tabular}
+\end{table}
+
+\section{Conclusion}
+% Conclusion: What have you learned? Suggest future ideas.
+
+
+\begin{thebibliography}{1}
+% datasets
+\bibitem{ck} Cohn-Kanade AU-Coded Facial Expression Database \url{http://www.pitt.edu/~emotion/ck-spread.htm}
+\bibitem{jaffe} MMI Facial Expression Database \url{http://mmifacedb.eu/}
+% git repos
+
+% papers
+\bibitem{metastudy} Meta-Analyis of the First Facial Expression Recognition Challenge. 2002. Valstar et al.
+\bibitem{universality} Elfenbein, H. A., & Ambady, N. (2002a). On the universality and cultural specificity of emotion recognition: A meta-analysis. Psychological Bulletin, 128(2), 205-235. 
+
+\bibitem{preprocess} Preprocessing of Face Images: Detection of Features and Pose. 1998. D Reisfeld and Yehezkel Yshurun.
+\bibitem{committeeNN} Facial expression (mood) recognition from facial images using committee neural networks. Saket S Kulkarni, Narender P Reddy and SI Hariharan
+\bibitem{tutorial} Facial Expression Recognition: A Brief Tutorial Overview. Claude C. Chibelushi, Fabrice Bourel.
+\end{thebibliography}
+
+
+\end{document}

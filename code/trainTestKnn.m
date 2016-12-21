@@ -4,7 +4,7 @@ if length(varargin) == 0
     sprintf('* using %s *', 'jaffe')
     jaffe(x_train, x_test, y_train, y_test)
 elseif length(varargin) == 1 && ~isempty(strmatch('ck', varargin{1}, 'exact'))
-    sprintf('* using %s *', 'cohn-kanade')
+    %sprintf('* using %s *', 'cohn-kanade')
     ck(x_train, x_test, y_train, y_test)
 else
     sprintf('trainTestKnn(x_train, x_test, y_train, y_test, *%s) \n    * optional param to use cohn-kanade', '"ck"')

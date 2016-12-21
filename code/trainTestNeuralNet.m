@@ -4,7 +4,7 @@ if length(varargin) == 0
     sprintf('* using %s *', 'jaffe')
     [trainIndices, testIndices] = jaffe(x_train, x_test, y_train, y_test, input);
 elseif length(varargin) == 1 && ~isempty(strmatch('ck', varargin{1}, 'exact'))
-    sprintf('* using %s *', 'cohn-kanade')
+    %sprintf('* using %s *', 'cohn-kanade')
     [trainIndices, testIndices] = ck(x_train, x_test, y_train, y_test, input);
 else
     sprintf('trainTestNeuralNet(x_train, x_test, y_train, y_test, input, *%s) \n    * optional param to use cohn-kanade', '"ck"')

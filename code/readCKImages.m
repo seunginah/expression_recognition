@@ -33,20 +33,20 @@ features = {'pixel', 'pixel_norm1', 'pixel_norm2', ...
     'gabor', 'gabor_norm1', 'gabor_norm2', ... 
     'soft_clustering', 'soft_clustering_norm1', 'soft_clustering_norm2', ...
     'edge_features', 'edge_features_n1', 'edge_features_n2', ...
-    'fiducial_points', 'fiducial_points_n1'}
+    'fiducial_points', 'fiducial_points_n1'};
 % lbp Time to extract full features 2579.03
 if roi == 1
-    featureType='gabor_norm1';
-    fprintf('+++Extracting ROI features...%s\n ',featureType);
+    featureType = 'gabor_norm1';
+    fprintf('+++Extracting ROI features...%s\n ', featureType);
     tic;
-    image_feats = extractFeaturesROI(croppedImages,featureType);
-    fprintf('Time to extract ROI features %.2f\n',toc);
+    image_feats = extractFeaturesROI(croppedImages, featureType);
+    fprintf('Time to extract ROI features %.2f\n', toc);
 else
-    featureType='hog';
-    fprintf('+++Extracting full image features...%s\n ',featureType);
+    featureType = features{20};
+    fprintf('+++Extracting full image features...%s\n ', featureType);
     tic;
     image_feats = extractFeatures(croppedImages,featureType);
-    fprintf('Time to extract full features %.2f\n',toc);
+    fprintf('Time to extract full features %.2f\n', toc);
 end
 
 %% feature selection / dim reduction
@@ -68,6 +68,8 @@ end
 
 
 %% train-test split 80-20%
+images = pca_decomp(image_feats); 
+images = nnmf_decomp(image_feats); 
 numTrain = floor(0.8*numOfFiles);
 fprintf('Num_train(%d) Num_test(%d)\n',numTrain,size(images,1)-numTrain);
 trainSet = zeros(size(images,1),numTrain);
@@ -78,16 +80,12 @@ testSet = images(numTrain+1:numOfFiles,:);
 trainLabels = labels(1:numTrain);
 testLabels = labels(numTrain+1:numOfFiles);
 
-x_train = trainSet;
-x_test = testSet;
-y_train = trainLabels;
-y_test = testLabels;
-
 %% run models
 trainTestDT(trainSet, testSet, trainLabels, testLabels, 'ck');
 trainTestKnn(trainSet, testSet, trainLabels, testLabels, 'ck');
 trainTestSVM(trainSet, testSet, trainLabels, testLabels, 'ck');
 trainTestNeuralNet(trainSet, testSet, trainLabels, testLabels, [50,10], 'ck');
+sprintf('----------- %s', '--------------')
 ensembleNeuralNet(trainSet, testSet, trainLabels, testLabels, 'ck');
 
 %trainTestAdaBoost(trainSet, testSet, trainLabels, testLabels, 'ck');
