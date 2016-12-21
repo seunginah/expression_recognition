@@ -37,16 +37,20 @@ For human interactions, an estimated $55\%$ of information is conveyed via emoti
 
 \section{Introduction}
 % Introduction: this section introduces facial expression recognition in general
+Facial expression recognition aims to automatically determine the emotional state of a person, based on their facial features. The established "basic emotions" to choose from include happiness, sadness, anger, fear, disgust, surprise, or neutral. Within the field there are slight variations on this set of emotions. 
 
-The domain of facial expression recognition has been shaped greatly by psychological research on emotional states. 
+The domain of facial expression recognition has been shaped greatly by social and psychological research on emotional states. The "universality studies" were a series of experiments in the early '70s that aimed to determine whether or not facial expressions are culture-specific. For example, a study showed the same images of emotional expressions of Americans to people from the United States, Brazil, Chile, Argentina, and Japan, and asked participants to guess the emotion. The researchers expected that expressions for emotions such as "anger" might be confused with other negative expressions, such as those for "disgust" or "fear". However, regardless of what country the participants were from, people were very good at recognizing emotions accurately. The consensus across all of the universality studies was that facial expressions are indeed universally recognizable \cite{universality_studies}. More recently, Elfenbein and Ambady published a meta-analysis of 168 studies (including the universality studies) that confirmed emotion recognition of the basic emotions is likely universal \cite{universality}.
 
+These studies provide strong foundations for the domain of facial expression recognition. We know that humans are capable of reliably recognizing basic emotions, and we know that the majority of those signals aren't too culture-specific. So, it's likely that the signals come from the physical facial features.
 
-Later, Tomkins recruited Paul Ekman and Carroll Izard to conduct what is known today as the “universality studies.” The first of these demonstrated high cross-cultural agreement in judgments of emotions in faces by people in both literate (Ekman, 1972, 1973; Ekman & Friesen, 1971; Ekman, Sorenson, & Friesen, 1969; Izard, 1971) and preliterate cultures (Ekman & Friesen, 1971; Ekman, et al., 1969). Then Friesen’s (1972) study documented that the same facial expressions of emotion were produced spontaneously by members of very different cultures in reaction to emotion-eliciting films.
-Since the original universality studies more than 30 studies examining judgments of facial expressions have replicated the universal recognition of emotion in the face (reviewed in Matsumoto, 2001). In addition a meta-analysis of 168 datasets examining judgments of emotion in the face and other nonverbal stimuli indicated universal emotion recognition well above chance levels (Elfenbein & Ambady, 2002a). And there have been over 75 studies that have demonstrated that these very same facial expressions are produced when emotions are elicited spontaneously (Matsumoto, Keltner, Shiota, Frank, & O'Sullivan, 2008). These findings are impressive given that they have been produced by different researchers around the world in different laboratories using different methodologies with participants from many different cultures but all converging on the same set of results. Thus there is strong evidence for the universal facial expressions of seven emotions – anger, contempt, disgust, fear, joy, sadness, and surprise (see Figure 1).
+% facial expression domain-specific
+FACS, FACS AU detection, EMFACS, 
+
 
 \section{Related Work} 
 % This section discusses relevant literature for your project
 Since our project domain was so broad, we 
+
 
 \subsection{Data Processing Techniques}
 % previous study comparing ROI vs full face
@@ -67,7 +71,14 @@ Since our project domain was so broad, we
 
 % 'fiducial_points'
 
-\subsection{Models}
+\subsection{Dimensionality Reduction Techniques}
+% PCA
+% NMF
+
+% when to use, when not to use
+% expectations
+
+\subsection{Classifiers}
 % give a good example of each, express expectations we have for our results
 
 % decision tree
@@ -86,27 +97,29 @@ Since our project domain was so broad, we
 
 \section{Approach}
 % Approach: This section details the framework of your project. Be specific, which means you might want to include equations, figures, plots, etc
-We wanted to understand, at a high level, what combinations of pre-processing, feature extraction, dimensionality reduction, and modeling techniques result in the best expression classifiers. Our approach was to build a pipeline with a variety of modular feature extraction and modeling functions, such that we could easily try many models. We took the most promising models and tuned them.
 
-Cross-database evaluation via same experiments on using diff image sets
+% motivate model pipeline style
+We wanted to understand, at a high level, what combinations of pre-processing, feature extraction, dimensionality reduction, and modeling techniques result in the best expression classifiers. Our approach was to build a pipeline with a variety of modular feature extraction and modeling functions, such that we could easily try many models. We took the most promising models, based on test set prediction accuracies, and tuned them. 
+
+% motivate data usage
+We performed cross-database evaluation of our methods, using both the JAFFE and Cohn-Kanade datasets. The motivation for this was two-fold; we wanted to corroborate our results as well as explore the effects of using different datasets for emotion recognition. In the experiment from the universality studies mentioned previously, not all emotions were recognized with equal agreement. For example, images depicting happiness had $95-100\%$ agreement across cultures, while images depicting fear and sadness had between $62-85\%$ agreement \cite{universality_studies}. The variability in emotion recognition might be explained in part by "in-group advantage". In-group advantage, in the context of facial expression recognition, describes the improved ability to accurately label emotions expressed by a person of your own ethnic group \cite{universality}. Often, people within an ethnic group have similar physical traits, which may contribute to the in-group advantage. We wondered if training on a more homogeneous set of facial images would improve the ability of classifiers to pick up on clear signals.
 
 %TODO : add all external packages here + then cite them
 Our implementation is written in Matlab, and requires the Image Processing, Fuzzy Logic, and the Neural Networks Toolbox. External packages include 
 
 \subsection{Preprocessing}
-aligning images using "similarity" transformation and landmarks, 
-cropping
+Pre-processing stage involves steps taken to make the classification invariant to scaling, translation or rotation
+
+% aligning images using "similarity" transformation and landmarks, 
+% cropping
 % show result of align + crop for both datasets
 
-finding regions of interest
+An optional pre-processing step is to extract ROIs. 
+Finding regions of interest
 % show result of ROI
 
-%Pre-processing stage involves steps taken to make the classification invariant to scaling, translation or rotation:
-%\subitem manual detection of eyes in the images 
-%\subitem rescaling and cropping images to align eyes
-%\subitem normalizing images to remove brightness effects, etc.
-
 \subsection{Feature Extraction}
+% describe the implementations of feature extraction techniques
 %  'pixel', 'pixel_norm1', 'pixel_norm2', 'pixel_sharpen', 'pixel_sharpen_norm1', 'pixel_sharpen_norm2',
 %  'pixel_gradient', 'pixel_gradient_norm1', 'pixel_gradient_norm2', 'hog', 'hog_norm1', 'hog_norm2', 
 %  'lbp', 'lbp_norm1', 'lbp_norm2', 'lbp2', 'gabor', 'gabor_norm1', 'gabor_norm2', 'soft_clustering', 
@@ -114,26 +127,29 @@ finding regions of interest
 % 'edge_features_n2', 'fiducial_points', 'fiducial_points_n1'
 
 \subsection{Classification}
-\begin{itemize}
-\item dimensionality reduction to check or reduce computational complexity and overfitting:
-\subitem PCA, ICA
-\item train a classifier or ensemble: 
-\subitem Decision trees, KNN, Boosting, Bagging, Naive Bayes, Neural networks, ensemble 
-\item tune hyperparameters:
-\subitem grid search, random search with iterative random sampling cross-validation, k-fold cross validation
-\end{itemize}
+
+% feature selection / dim reduction
+dimensionality reduction to check or reduce computational complexity and overfitting
+PCA, NMF
+
+% train/test split
+
+% classifiers
+Decision Tree
+K-Nearest Neighbors (KNN)
+Support Vector Machine (SVM)
+Neural Network
+ensemble Neural Network
+Adaboost
+Cluster matching template
+HCRF
+
 
 \section{Experiments} 
 % This section begins with what kind of experiments you're doing, what kind of dataset(s) you're using, and what is the way you measure or evaluate your results. It then shows in details the results of your experiments. By details, we mean both quantitative evaluations (show numbers, figures, tables, etc) as well as qualitative results (show images, example results, etc).
 
 \subsection{Data}
-There are generally 6 or 7 main emotions studied: angry, happy, sad, fear, disgust, surprise, and neutral. We think it would be interesting to see how the pipelines we implement perform on each of the following facial expression datasets:
-\begin{itemize}
-\item Cohn-Kanade AU-Coded Facial Expression Database \cite{ck}
-\subitem 500 images from 100 individuals
-\subitem annotation of FACS action units and emotion-specified expressions
-\subitem only frontal images of faces posed to express: joy, surprise, anger, fear, disgust, and sadness
-\end{itemize}
+The Version 1 of the Cohn-Kanade AU-Coded Facial Expression Database \cite{ck} includes 487 sequences from 97 individuals, who were asked to make facial expressions for the basic emotions. A sequence, which is typically comprised of about 20 photographs, begins with a neutral expression and peaks at an emotional expression. The peak image is not necessarily the last one of the sequence. For each sequence, only the image corresponding to the peak expression is annotated with FACS and labeled with the emotion.
 
 
 We used the CIFAR-10 dataset, which consists of $60,000$ images evenly distributed into 10 classes (airplane, automobile, bird, cat, deer, dog, frog, horse, ship, truck). Each $32 \times 32 \times 3$ pixel image is represented by the RGB color model, so it has 3 channels. We will remove a $16 \times 16$ region of each image, and consider the original image to be the original distribution of $32 \times 32 \times 3 = 3,072$ dimensions. All images have normalized pixel intensities. \\
@@ -169,13 +185,17 @@ Pixel CNN           &   -       &  -                     \\ \hline
 
 \begin{thebibliography}{1}
 % datasets
-\bibitem{ck} Cohn-Kanade AU-Coded Facial Expression Database \url{http://www.pitt.edu/~emotion/ck-spread.htm}
+\bibitem{ck} Comprehensive Database for Facial Expression Analysis. Kanade, Cohn, Tian.
+\bibitem{ck_extended} The Extended Cohn-Kanade Dataset (CK+): A complete dataset for action unit and emotion-specified expression.
 \bibitem{jaffe} MMI Facial Expression Database \url{http://mmifacedb.eu/}
 % git repos
 
+% chapter in book
+\bibitem{universality_studies} chapt 4 Facial Expression
+
 % papers
 \bibitem{metastudy} Meta-Analyis of the First Facial Expression Recognition Challenge. 2002. Valstar et al.
-\bibitem{universality} Elfenbein, H. A., & Ambady, N. (2002a). On the universality and cultural specificity of emotion recognition: A meta-analysis. Psychological Bulletin, 128(2), 205-235. 
+\bibitem{universality} Elfenbein, H. A., \& Ambady, N. (2002a). On the universality and cultural specificity of emotion recognition: A meta-analysis. Psychological Bulletin, 128(2), 205-235. 
 
 \bibitem{preprocess} Preprocessing of Face Images: Detection of Features and Pose. 1998. D Reisfeld and Yehezkel Yshurun.
 \bibitem{committeeNN} Facial expression (mood) recognition from facial images using committee neural networks. Saket S Kulkarni, Narender P Reddy and SI Hariharan
