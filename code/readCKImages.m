@@ -8,9 +8,11 @@ function readCKImages()
 %addpath(genpath('./drtoolbox'));
 
 %variables to set.
+rng(666) % set random seed
 shuffle=1;
 fprintf('shuffling or no:%d\n ',shuffle);
 roi=0;
+
 %only one of the following to be true.
 pca_decomposition=1;
 nmf_decomposition=0;
@@ -33,7 +35,7 @@ numOfFiles = length(emotion_labels);
 %shuffle dataset
 if shuffle==1
     ix=randperm(numOfFiles);
-    croppedImages=croppedImages(:,:,ix);
+    croppedImages=original(:,:,ix);
     labels=labels(ix);
 end
 
@@ -78,15 +80,22 @@ testSet=zeros(size(images,1),(numOfFiles-numTrain));
 trainSet=images(1:numTrain,:);
 testSet=images(numTrain+1:numOfFiles,:);
 
-trainLabels=labels(1:numTrain);
-testLabels=labels(numTrain+1:numOfFiles);
+% becomes a n x 2 character matrix -- be careful with reading from this
+trainLabels=char(labels(1:numTrain));
+testLabels=char(labels(numTrain+1:numOfFiles));
 
-%TRain and test DecisionTree
+x_train = trainSet;
+x_test = testSet;
+y_train = trainLabels;
+y_test = testLabels;
+
+%DecisionTree
+trainTestDT(trainSet, testSet, trainLabels, testLabels, 'ck');
+
 %trainTestAdaBoost(trainSet,testSet,trainLabels,testLabels);
-trainTestDT(trainSet,testSet,trainLabels,testLabels);
-trainTestKnn(trainSet,testSet,trainLabels,testLabels);
-clusterTEmplateMatch(original,trainSet,testSet,trainLabels,testLabels);
-trainTestSVM(trainSet,testSet,trainLabels,testLabels);
-trainTestNeuralNet(trainSet,testSet,trainLabels,testLabels);
-ensembleNeuralNet(trainSet,testSet,trainLabels,testLabels);
+trainTestKnn(trainSet, testSet, trainLabels, testLabels, 'ck');
+clusterTEmplateMatch(trainSet, testSet, trainLabels, testLabels, 'ck');
+trainTestSVM(trainSet, testSet, trainLabels, testLabels, 'ck');
+trainTestNeuralNet(trainSet, testSet, trainLabels, testLabels, input, 'ck');
+ensembleNeuralNet(trainSet, testSet, trainLabels, testLabels, 'ck');
 end
