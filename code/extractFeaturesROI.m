@@ -52,7 +52,55 @@ function features=extractFeaturesROI(images,featureType)
                      features=EdgeFeatures_norm1(images);
                 case 'edge_features_n2'
                      features=EdgeFeatures_norm2(images);
+                case 'gabor_v2'
+                    %combine with pca/adaboost for dimensionality reduction
+                    features=GaborFeatures_V2(images);     
+                     
          end
+         
+function features=GaborFeatures_V2(images)
+     block_c=[17,40,20,40]; %sums to 117
+     block_r=[55,35,25,65]; %sums to 180
+     blocks=[6,8,12,14,16];
+     wavelengths=[2,4,8]; %Try other options
+     orients=[0,45,90];%,135,180];
+     gaborBank=gabor(wavelengths,orients);
+     num_filters=length(wavelengths)*length(orients);
+         %num_features=size(images,1)*size(images,2)*1*num_filters;
+     num_blocks=length(blocks); 
+     num_pixels=0; %Per image
+     C=mat2cell(images(:,:,1),block_r,block_c);
+     for i=1:num_blocks
+         num_pixels=num_pixels+size(C{blocks(i)},1)*size(C{blocks(i)},2);
+     end    
+             
+     num_features=num_pixels*num_filters;
+     features=zeros(size(images,3),num_features);
+         
+     for im_num=1:size(images,3)
+         im=images(:,:,im_num);
+             %disp(size(im));
+         im=imresize(im,1); 
+             %disp(size(im));
+             %figure;imshow(im/100
+        [mag,phase]=imgaborfilt(im,gaborBank);
+         i=1;
+             %figure
+         feats=[];
+         for p=1:num_filters
+             mag_p=mag(:,:,p);
+             C=mat2cell(mag_p,block_r,block_c); 
+             for block=blocks
+                 block_im=C{block}.';
+                 feats=[feats block_im(:).'];
+             end              
+              %  subplot(3,3,p);imshow(mag_p/100);
+             end
+            % disp(size(features)); disp(size(feats));
+             features(im_num,:)=feats; 
+         end
+end  
+         
          
 function features=EdgeFeatures(images)
          for im_num=1:size(images,3) 
