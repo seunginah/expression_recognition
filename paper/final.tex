@@ -26,7 +26,7 @@ College of Information \& Computer Sciences \\
 A lot of research has gone into the supervised learning task of expression recognition from images in recent years. Several works have approached this through building facial models or compiling feature based techniques.We have based our experiments mostly on several previous works, as well as techniques like soft clustering that have succeeded at other difficult tasks like image segmentation as well as natural language processing.
 \noindent We built an expression recognition pipeline that can detect faces in images, extract features from them, and classify the mood or expression of the person. We experimented with a variety of preprocessing, feature extraction, dimensionality reduction, and modeling methods. To understand which combinations worked best, we evaluated the models with prediction accuracies on hold-out test sets. We have evaluated our pipeline using the Japanese Female Facial Expression (JAFFE), Cohn-Kanade (CK), and Cohn-Kanade Extended (CK+) datasets. The CK and CK+ datasets were combined into one dataset. 
 
-\noindent \paragraph{} Our best working pipeline identified several fiducial points on a face, extracted gabor filter features at those points, applied Principle Component Analysis (PCA) for dimensionality reduction, and used an SVM for classification. The resulting model had a test accuracy value of 95.2\% on the JAFFE dataset.
+\noindent Our best working pipeline identified several fiducial points on a face, extracted gabor filter features at those points, applied Principle Component Analysis (PCA) for dimensionality reduction, and used an SVM for classification. The resulting model had a test accuracy value of 95.2\% on the JAFFE dataset.
 
 \section{Introduction}
 % Introduction: this section introduces facial expression recognition problem, as well as important domain tools such as FACS
@@ -56,7 +56,6 @@ We performed cross-database evaluation of our methods, using both the JAFFE and 
 Our implementation is written in Matlab, and requires the Image Processing, Fuzzy Logic, and the Neural Networks Toolbox. External packages include the Matlab Toolbox for Dimensionality reduction \cite{drtoolbox}.
 
 \subsection{Data}
-\paragraph{}
 \textbf{JAFFE dataset}: The database \cite{jaffe} contains 213 images of 7 facial expressions (6 basic facial expressions and 1 neutral) posed by 10 Japanese female models. Each image has been rated on 6 emotion adjectives by 60 Japanese subjects. The images are of dimensions 256x256, the 7 facial expressions are ‘Anger’, ’Disgust’, ’Fear’, ’Happy’, ’Sad’ , ’Surprise’ and ‘Neutral’.  The annotations are embedded into the file names and we have used Matlab Code to extract them as labels. Here are some examples of cropped images $180\times117$ collated from each emotion in Figure \ref{fig:jaffe_examples}
 
 \begin{figure}[h]
@@ -78,7 +77,6 @@ What makes the task of expression recognition harder is that different people ex
 \subsection{Data Processing Techniques}
 For both datasets, we wanted to experiment on images of full faces as well as extracted regions of interest (ROIs). We originally expected to implement facial detection; since our images all had only one centralized face, our pre-processing steps were simply to align and crop images, and then to extract ROIs.
 
-\paragraph{}
 \textbf{
 JAFFE Dataset}: The original images from the dataset had a lot of background noise, which gave poor classification performance of around 12-20\% accuracy with SVM using pixel intensities as features. We cropped the images to $180\times117$ dimensions, forcing only the face into the image and setting a distance of 55 pixels between the eyes. 
 \par
@@ -97,21 +95,19 @@ CK+ Dataset}: The CK images needed to be aligned, especially since they were of 
 \subsection{Feature Extraction Techniques}
 \paragraph{}
 \textbf{
-Pixel intensities}: This method uses the raw pixel intensities of input images to describe the image. We have implemented it under the method called 'pixel'. Length normalization of these feature vectors can improve accuracies by removing the effects of illumination or shadowing, which we implemented as 'pixel norm1'. Replacing the intensity values with a square of the feature values is implemented as 'pixel norm2'.
+Pixel intensities}: This method uses the raw pixel intensities of input images to describe the image. We have implemented it under the method called 'pixel'. Length normalization of these feature vectors can improve accuracies by removing the effects of illumination or shadowing, which we implemented as 'pixel norm1'. Replacing the intensity values with a square of the feature values is implemented as 'pixel norm2'. \newline
 
-\paragraph{}
 \textbf{
-Pixel sharpening}: Input images are sharpened such that edges in an image are sharpened. The resulting image raw pixel intensities are used to represent the image, optionally as an image feature vector. We have used 'imsharpen()' from the Image Processing Toolbox, which allows us to control the amount of sharpening and the areas on a face where to apply this sharpening to. We found the optimal amount of sharpening is 0.8, with threshold 0.25.An example in Figure \ref{fig:sharp_image}
+Pixel sharpening}: Input images are sharpened such that edges in an image are sharpened. The resulting image raw pixel intensities are used to represent the image, optionally as an image feature vector. We have used 'imsharpen()' from the Image Processing Toolbox, which allows us to control the amount of sharpening and the areas on a face where to apply this sharpening to. We found the optimal amount of sharpening is 0.8, with threshold 0.25.An example in Figure \ref{fig:sharp_image} \newline
 
 \begin{figure}[h]
 \includegraphics[width=8cm]{figs/sharpen.PNG}
 \caption{Original image juxtaposed with sharpened image.}
 \label{fig:sharp_image}
 \end{figure}
-
-\paragraph{}
+7
 \textbf{
-Pixel Gradients}: In this project, we have used raw pixel intensities of x-gradient of an image as its representation, raw pixel intensities of y-gradient of the image and the magnitude of x and y gradient of the input image as its representation and recorded the results.An example in Figure \ref{fig:grad_image}
+Pixel Gradients}: In this project, we have used raw pixel intensities of x-gradient of an image as its representation, raw pixel intensities of y-gradient of the image and the magnitude of x and y gradient of the input image as its representation and recorded the results.An example in Figure \ref{fig:grad_image} \newline
 
 \begin{figure}[h]
 \includegraphics[width=8cm]{figs/pixel_gradient.jpg}
@@ -119,17 +115,16 @@ Pixel Gradients}: In this project, we have used raw pixel intensities of x-gradi
 \label{fig:grad_image}
 \end{figure}
 
-\paragraph{}
-\textbf{Pixel Edge features}: Edges in a given image are identified using a sophisticated 'canny' edge detector or a more simpler 'sobel' edge detector. The raw pixel intensity values of the resulting image as used as features. An example of a 'canny' edge detector output is shown in figure \ref{fig:edge_image}.
+
+\textbf{Pixel Edge features}: Edges in a given image are identified using a sophisticated 'canny' edge detector or a more simpler 'sobel' edge detector. The raw pixel intensity values of the resulting image as used as features. An example of a 'canny' edge detector output is shown in figure \ref{fig:edge_image}. \newline
 
 \begin{figure}[h]
 \includegraphics[width=8cm]{figs/im_edge.png}
 \caption{Edge feature representation of a face}
 \label{fig:edge_image}
 \end{figure}
-
-\paragraph{}
-\textbf{Fiducial points}: We have identified several key points on the input face and extracted a set of gabor filter values at those points, concatenated them to obtain the full image representation.  An example of an input image with fiducial point locations marked with an 'x' on it. There are total 94 of the points as shown in the image. WE have focused on extracting features around eyes,along eye brows, around nose and lip corners, some on forehead and chin area, a few on cheeks. Research has shown that the points on cheeks and forehead seem to have least impact on the classification accuracy.So we have decided to limit ourselves to very few points in these areas of a face.An example shown in Figure \ref{fig:fid_image}.  
+7
+\textbf{Fiducial points}: We have identified several key points on the input face and extracted a set of gabor filter values at those points, concatenated them to obtain the full image representation.  An example of an input image with fiducial point locations marked with an 'x' on it. There are total 94 of the points as shown in the image. WE have focused on extracting features around eyes,along eye brows, around nose and lip corners, some on forehead and chin area, a few on cheeks. Research has shown that the points on cheeks and forehead seem to have least impact on the classification accuracy.So we have decided to limit ourselves to very few points in these areas of a face.An example shown in Figure \ref{fig:fid_image}.  \newline
 
 \begin{figure}[h]
 \includegraphics[width=8cm]{figs/im_fid.PNG}
@@ -137,8 +132,8 @@ Pixel Gradients}: In this project, we have used raw pixel intensities of x-gradi
 \label{fig:fid_image}
 \end{figure}
 
- \paragraph{}
-\textbf{HOG features(Histogram of oriented gradients)}: The technique counts occurrences of gradient orientation in localized portions of an image, using overlapping local contrast normalization for improved accuracy. The idea behind the HOG descriptor is that local object appearance and shape within an image can be described by the distribution of intensity gradients or edge directions. The image is divided into small connected regions called cells, and for the pixels within each cell, a histogram of gradient directions is calculated. The descriptor is the concatenation of these histograms. For improved accuracy, the local histograms can be contrast-normalized by calculating a measure of the intensity across a larger region of the image, called a block, and then using this value to normalize all cells within the block. This normalization results in better invariance to changes in illumination and shadowing.An example shown in Figure \ref{fig:hog_image}
+
+\textbf{HOG features(Histogram of oriented gradients)}: The technique counts occurrences of gradient orientation in localized portions of an image, using overlapping local contrast normalization for improved accuracy. The idea behind the HOG descriptor is that local object appearance and shape within an image can be described by the distribution of intensity gradients or edge directions. The image is divided into small connected regions called cells, and for the pixels within each cell, a histogram of gradient directions is calculated. The descriptor is the concatenation of these histograms. For improved accuracy, the local histograms can be contrast-normalized by calculating a measure of the intensity across a larger region of the image, called a block, and then using this value to normalize all cells within the block. This normalization results in better invariance to changes in illumination and shadowing.An example shown in Figure \ref{fig:hog_image} \newline
 
 \begin{figure}[h]
 \includegraphics[width=8cm]{figs/HOG2.png}
@@ -146,32 +141,23 @@ Pixel Gradients}: In this project, we have used raw pixel intensities of x-gradi
 \label{fig:hog_image}
 \end{figure}
 
-\paragraph{}
-\textbf{LBP features(Local Binary Patterns)}: These are special kind of visual descriptors that work well with texture classification and recognition tasks. Multiple variants for compiling these features appear in literature like breaking an image into blocks and extracting local histograms from each of the blocks and concatenating them or extracting a single histogram for the full image and finally implementing it as a "bag of words" representation where the final representation of the image reflects how many histograms of a particular type exist in the given  image. 
-
-\paragraph{}
-\textbf{Gabor filters}: The characteristics of certain cells in the visual cortex of some mammals can be approximated by these filters, which can be viewed as a sinusoidal plane of particular frequency and orientation, modulated by a Gaussian envelope. They have been found to be particularly appropriate for texture representation and discrimination. The convolution of Gabor fillters is done by computing the Fourier transform of the image and multiplying with the Fourier transform of the Gabor filter in the frequency domain. This aids in reducing computation time. Since they have are used in fingerprint recognition to enhance the fingerprint features, we thought it might help enhance minute facial features as well. An example in Figure \ref{fig:gabor_image}
+\textbf{LBP features(Local Binary Patterns)}: These are special kind of visual descriptors that work well with texture classification and recognition tasks. Multiple variants for compiling these features appear in literature like breaking an image into blocks and extracting local histograms from each of the blocks and concatenating them or extracting a single histogram for the full image and finally implementing it as a "bag of words" representation where the final representation of the image reflects how many histograms of a particular type exist in the given  image. \newline
+\textbf{Gabor filters}: The characteristics of certain cells in the visual cortex of some mammals can be approximated by these filters, which can be viewed as a sinusoidal plane of particular frequency and orientation, modulated by a Gaussian envelope. They have been found to be particularly appropriate for texture representation and discrimination. The convolution of Gabor fillters is done by computing the Fourier transform of the image and multiplying with the Fourier transform of the Gabor filter in the frequency domain. This aids in reducing computation time. Since they have are used in fingerprint recognition to enhance the fingerprint features, we thought it might help enhance minute facial features as well. An example in Figure \ref{fig:gabor_image} \newline
 
 \begin{figure}[h]
 \includegraphics[width=8cm]{figs/gaboorv2.PNG}
 \caption{A sample of gabor filters applied to a human face.}
 \label{fig:gabor_image}
 \end{figure}
-\paragraph{}
 
-\textbf{Soft clustering}: We have congregated the input data into 7 clusters through a fuzzy clustering mechanism where each point has membership within all the resulting clusters with a degree of membership that determines the extent of its belonging to that cluster, instead of strictly belonging to a single cluster. For each pixel in an image, we identified the centroids of the resulting clusters and represented an image with concatenation of its membership value to a cluster, followed by the euclidean distance between the data point and cluster center. This results in a high dimensional feature vector whose dimensions must be reduced using one of the dimensionality reduction techniques. We implemented a squared version of soft clustering, where instead of using an euclidean distance during the concatenation step, we take the square of euclidean distance. This has been reported to produce better results in several image segmentation tasks.
-
-\paragraph{}
+\textbf{Soft clustering}: We have congregated the input data into 7 clusters through a fuzzy clustering mechanism where each point has membership within all the resulting clusters with a degree of membership that determines the extent of its belonging to that cluster, instead of strictly belonging to a single cluster. For each pixel in an image, we identified the centroids of the resulting clusters and represented an image with concatenation of its membership value to a cluster, followed by the euclidean distance between the data point and cluster center. This results in a high dimensional feature vector whose dimensions must be reduced using one of the dimensionality reduction techniques. We implemented a squared version of soft clustering, where instead of using an euclidean distance during the concatenation step, we take the square of euclidean distance. This has been reported to produce better results in several image segmentation tasks.\newline
 
 \subsection{Dimensionality Reduction Techniques}
-\paragraph{}
-\textbf{PCA}:PCA or Principal Component Analysis reduces the dimensions of feature space through Singular Value Decomposition (SVD), learns a basis, and represents each input vector as a sum of the basis elements, in a lower dimension. It only retains the k most prominent eigenvectors, along which the input data has highest variance. 
-
-\paragraph{}
-\textbf{NMF}: This is a dimensionality reduction mechanism that factors a nonnegative $N \times M$ matrix $A$ into non-negative factors $W(N \times K$) and a basis or a dictionary $H(K \times M)$.  $W*H$ is a lower-rank approximation to $A$ and the factors $W$ and $H$ are chosen to minimize the root-mean-squared residual difference between $A$ and $W*H$. The factorization uses an iterative method called 'alternative least squares' starting with random initial values for $W$ and $H$. The main difference with PCA lies with the fact that the factors are non-negative and for the task of facial expression recognition this could translate into a basis $H$ that contains parts of different faces from the input data like eyes, nose, or ears.
-
-\paragraph{}
-\textbf{t-SNE}:This involves a dimensionality reduction mechanism where higher dimensional vectors are transformed into lower dimensions while retaining the distances between those points intact. This provides a very helpful tool for visualization of data. We used an implementation of t-SNE from the github package called 'Dimensionality Reduction Toolbox' \cite{drtoolbox}. The t-SNE representation for pixel sharpened features is provided in Figure \ref{fig:tsne}. Data points of a certain class are all represented with a certain color. 
+\textbf{PCA}:PCA or Principal Component Analysis reduces the dimensions of feature space through Singular Value Decomposition (SVD), learns a basis, and represents each input vector as a sum of the basis elements, in a lower dimension. It only retains the k most prominent eigenvectors, along which the input data has highest variance. \newline 
+\
+  \textbf{NMF}: This is a dimensionality reduction mechanism that factors a nonnegative $N \times M$ matrix $A$ into non-negative factors $W(N \times K$) and a basis or a dictionary $H(K \times M)$.  $W*H$ is a lower-rank approximation to $A$ and the factors $W$ and $H$ are chosen to minimize the root-mean-squared residual difference between $A$ and $W*H$. The factorization uses an iterative method called 'alternative least squares' starting with random initial values for $W$ and $H$. The main difference with PCA lies with the fact that the factors are non-negative and for the task of facial expression recognition this could translate into a basis $H$ that contains parts of different faces from the input data like eyes, nose, or ears.\newline
+  \\
+\textbf{t-SNE}:This involves a dimensionality reduction mechanism where higher dimensional vectors are transformed into lower dimensions while retaining the distances between those points intact. This provides a very helpful tool for visualization of data. We used an implementation of t-SNE from the github package called 'Dimensionality Reduction Toolbox' \cite{drtoolbox}. The t-SNE representation for pixel sharpened features is provided in Figure \ref{fig:tsne}. Data points of a certain class are all represented with a certain color. \newline
 
 \begin{figure}[h]
 \includegraphics[width=8cm]{figs/tsne.PNG}
@@ -180,16 +166,12 @@ Pixel Gradients}: In this project, we have used raw pixel intensities of x-gradi
 \end{figure}
 
 \subsection{Classifiers}
-\paragraph{}
-\textbf{K-Nearest Neighbors}: This is a non-parametric classifier that stores all of its training data in memory which makes its training time to be almost negligible. It matches a given test sample to each of the stored data point through Euclidean or Minkowski distance metric and uses the vote of $k$ nearest neighbors to assess the class label of that point. Here, $k$ is the hyper parameter. This is very susceptible to noise in the input data and suffers from the curse of high dimensionality.
+\textbf{K-Nearest Neighbors}: This is a non-parametric classifier that stores all of its training data in memory which makes its training time to be almost negligible. It matches a given test sample to each of the stored data point through Euclidean or Minkowski distance metric and uses the vote of $k$ nearest neighbors to assess the class label of that point. Here, $k$ is the hyper parameter. This is very susceptible to noise in the input data and suffers from the curse of high dimensionality. \newline
+\textbf{SVM (Support Vector Machines)}: SVM is a linear classifier that finds a maximum margin hyperplane separating two classes when they are linearly separable. If they are not linearly separable, it implicitly translates them into a higher dimensional space and finds a most fitting linear hyperplane which has non-linear boundary shape in the original space. SVMs take a significant amount of time to train (depending on the number of input dimensions) and testing also takes a significant amount of time. They perform poorly if input data contains lot of noise. Emotion recognition here is framed as a multi-class classification problem where a data point is to be classified as one of the many classes. Our implementation was with SVM in a one-versus-rest mode, where there are multiple binary learners trained one for each class predicting if the given data point belongs to it or not.\newline
 
-\paragraph{}
-\textbf{SVM (Support Vector Machines)}: SVM is a linear classifier that finds a maximum margin hyperplane separating two classes when they are linearly separable. If they are not linearly separable, it implicitly translates them into a higher dimensional space and finds a most fitting linear hyperplane which has non-linear boundary shape in the original space. SVMs take a significant amount of time to train (depending on the number of input dimensions) and testing also takes a significant amount of time. They perform poorly if input data contains lot of noise. Emotion recognition here is framed as a multi-class classification problem where a data point is to be classified as one of the many classes. Our implementation was with SVM in a one-versus-rest mode, where there are multiple binary learners trained one for each class predicting if the given data point belongs to it or not.
 
-\paragraph{}
-\textbf{Decision Trees}: This is a classifier that gives a piece-wise linear decision boundaries that are parallel to axes or dimensions of input data. It builds a tree from the input features by picking a feature which gives a maximum reduction in  entropy value or a maximum increase in gini index or information gain.This is a recursive process and stops when a maximum depth is reached or all the data points in a leaf belong to the same class label. Decision trees are known to be more robust to noise in the input and certain techniques like pruning can control over fitting when number of training examples is small. It also seems to do well with high dimensional data.
+\textbf{Decision Trees}: This is a classifier that gives a piece-wise linear decision boundaries that are parallel to axes or dimensions of input data. It builds a tree from the input features by picking a feature which gives a maximum reduction in  entropy value or a maximum increase in gini index or information gain.This is a recursive process and stops when a maximum depth is reached or all the data points in a leaf belong to the same class label. Decision trees are known to be more robust to noise in the input and certain techniques like pruning can control over fitting when number of training examples is small. It also seems to do well with high dimensional data. \newline
 
-\paragraph{}
 \textbf{Neural Networks}: Neural networks are typically organized in layers that replicate layers of neurons in human brain. Layers are made up of a number of interconnected 'nodes' which contain an 'activation function'. Patterns are presented to the network via the 'input layer', which communicates to one or more 'hidden layers' where the actual processing is done via a system of weighted 'connections'. These classifiers with number of layers greater than or equal to 2 can represent any arbitrary function in the universe. We used a two-layer neural network classifier with hidden units of dimension $[50, 10]$.
 
 The second generation architecture to neural networks are convolutional neural networks, which are very powerful tools in the domain of image recognition, but require more data than we had for decent performance. They require lots of training data to prevent over fitting or offset the complexity of their model. So, we used a fully connected network. Neural networks can also be combined into ensembles. We used an ensemble of 2 neural networks with hidden dimensions $[60,10]$. These hidden unit dimensions were picked after manual hyperparameter tuning, during which we discovered that lower numbers of units produced poorer accuracy results.
@@ -294,29 +276,24 @@ We have also noticed that the number of mis-classifications is more in the case 
 
 \begin{thebibliography}{1}
 % datasets
-\bibitem{ck} Comprehensive Database for Facial Expression Analysis. Kanade, Cohn, Tian.
-\bibitem{ck_extended} The Extended Cohn-Kanade Dataset (CK+): A complete dataset for action unit and emotion-specified expression.
+\bibitem{ck} Comprehensive Database for Facial Expression Analysis. T Kanade, J.F. Cohn, Y. Tian.
+\bibitem{ck_extended} The Extended Cohn-Kanade Dataset (CK+): A complete dataset for action unit and emotion-specified expression. P.Lucey, J.F. Cohn, T. Kanade, et al. 
 \bibitem{jaffe} MMI Facial Expression Database \url{http://mmifacedb.eu/}
-
 % git repos
 \bibitem{drtoolbox} Matlab Toolbox for Dimensionality Reduction \url{https://lvdmaaten.github.io/drtoolbox/}
-
 % chapter in book
-\bibitem{universality_studies} chapt 4 Facial Expression
-
+\bibitem{universality_studies} Culture and Emotional Expression. David Matsumoto. \url{http://www.davidmatsumoto.com/content/Matsumoto%202008%20HK%20Conference.pdf}
 % papers
-\bibitem{nigam2006}Text classification from labeled and unlabeled documents using EM. Nigam Kamal and McCallum  Andrew Kachites and Thrun Sebastian and Mitchell Tom.
-\bibitem{why_detect} What is the Value of Embedding Artificial Emotional Prosody in Human–Computer Interactions? Implications for Theory and Design in Psychological Science. 
-\bibitem{cnn_au} Do Deep Neural Networks Learn Facial Action Units When Doing Expression Recognition?
+\bibitem{nigam2006}Text classification from labeled and unlabeled documents using EM. N. Kamal, A. McCallum, A. Kachites, T. Sebastian and M. Tom. 
+\bibitem{why_detect} What is the Value of Embedding Artificial Emotional Prosody in Human–Computer Interactions? Implications for Theory and Design in Psychological Science. R.L.C. Mitchell and Y. Xu. 2015. Frontiers in Psychology.
 \bibitem{metastudy} Meta-Analyis of the First Facial Expression Recognition Challenge. 2002. Valstar et al.
 \bibitem{universality} Elfenbein, H. A., \& Ambady, N. (2002a). On the universality and cultural specificity of emotion recognition: A meta-analysis. Psychological Bulletin, 128(2), 205-235. 
 \bibitem{preprocess} Preprocessing of Face Images: Detection of Features and Pose. 1998. D Reisfeld and Yehezkel Yshurun.
-\bibitem{committeeNN} Facial expression (mood) recognition from facial images using committee neural networks. Saket S Kulkarni, Narender P Reddy and SI Hariharan
+\bibitem{committeeNN} Facial expression (mood) recognition from facial images using committee neural networks. S.S. Kulkarni, N.P. Reddy and S.I. Hariharan.
 \bibitem{tutorial} Facial Expression Recognition: A Brief Tutorial Overview. Claude C. Chibelushi, Fabrice Bourel.
-\bibitem{smallsampleFER}Learning From Examples in the Small Sample Case:Face Expression Recognition.Guo Guodong ,Charles R. Dyer.
+\bibitem{smallsampleFER}Learning From Examples in the Small Sample Case:Face Expression Recognition.Guo Guodong, Charles R. Dyer.
 \bibitem{VisualcuesFER}Facial Expression Classification using Visual Cues and Language. Abhishek Kar
 \bibitem{FERfeaturebased}Feature-Based Facial Expression Recognition: Sensitivity Analysis and ExperimentsWith a Multi-Layer Perceptron. Zhengyou Zhang
-
 \bibitem{FERvariablelighting}Image Processing Pipeline for Facial Expression Recognition under Variable Lighting.Ralph Ma, Amr Mohamed.
 
 \end{thebibliography}
