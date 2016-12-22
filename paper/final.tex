@@ -1,22 +1,13 @@
 \documentclass[10pt,twocolumn,letterpaper]{article}
 
-\usepackage{cvpr}
-\usepackage{times}
-\usepackage{epsfig}
 \usepackage{graphicx}
 \usepackage{amsmath}
 \usepackage{amssymb}
 % Include other packages here, before hyperref.
 \usepackage{hyperref}
 
-\cvprfinalcopy % *** Uncomment this line for the final submission
-\def\cvprPaperID{****} % *** Enter the CVPR Paper ID here
-\def\httilde{\mbox{\tt\raisebox{-.5ex}{\symbol{126}}}}
-% Pages are numbered in submission mode, and unnumbered in camera-ready
-\ifcvprfinal\pagestyle{empty}\fi
-
 % graphics pull from this folders
-\graphicspath{{../figs/}}
+\graphicspath{{./figs}}
 
 \begin{document}
 \title{Expression Recognition}
@@ -24,166 +15,282 @@
 \author{Nagasravika Bodapati \& Grace Yoo \\ 
 University of Massachusetts Amherst \\ 
 College of Information \& Computer Sciences \\
-{\tt\small \{gyoo, nbodapati\}@cs.umass.edu} \\
+{\tt\small \{nbodapati,gyoo\}@cs.umass.edu} \\
 }
 
 \maketitle
 
 \section{Abstract} 
 % no more than 300 words
-For human interactions, an estimated $55\%$ of information is conveyed via emotional cues and the rest is through voice intonations and words used. Thus, using detection techniques to allow machines to recognize emotional states of humans may greatly improve human-computer interactions. For example, a machine might be trained to assess the quality of a lecture or a movie by reading the facial expressions of the audience; seeing many happy faces might suggest the event is interesting, while recognizing bored expressions might suggest the opposite.  \\
+%TODO : cite this
+A lot of research has gone into the supervised learning task of expression recognition from images in recent years. Several works have approached this through building facial models or compiling feature based techniques.We have based our experiments mostly on several previous works, as well as techniques like soft clustering that have succeeded at other difficult tasks like image segmentation as well as natural language processing.
+\noindent We built an expression recognition pipeline that can detect faces in images, extract features from them, and classify the mood or expression of the person. We experimented with a variety of preprocessing, feature extraction, dimensionality reduction, and modeling methods. To understand which combinations worked best, we evaluated the models with prediction accuracies on hold-out test sets. We have evaluated our pipeline using the Japanese Female Facial Expression (JAFFE), Cohn-Kanade (CK), and Cohn-Kanade Extended (CK+) datasets. The CK and CK+ datasets were combined into one dataset. 
 
-\noindent Our objective is to build an expression recognition pipeline that can detect faces in images, extract features from them, and classify the mood or expression of the person. We will experiment with a variety of preprocessing, feature extraction, and modeling methods.
+\noindent \paragraph{} Our best working pipeline identified several fiducial points on a face, extracted gabor filter features at those points, applied Principle Component Analysis (PCA) for dimensionality reduction, and used an SVM for classification. The resulting model had a test accuracy value of 95.2\% on the JAFFE dataset.
 
 \section{Introduction}
-% Introduction: this section introduces facial expression recognition in general
-Facial expression recognition aims to automatically determine the emotional state of a person, based on their facial features. The established "basic emotions" to choose from include happiness, sadness, anger, fear, disgust, surprise, or neutral. Within the field there are slight variations on this set of emotions. 
+% Introduction: this section introduces facial expression recognition problem, as well as important domain tools such as FACS
+For human interactions, an estimated $55\%$ of information is conveyed via emotional cues and the rest is through voice intonations and words used. Thus, using detection techniques to allow machines to recognize emotional states of humans may greatly improve human-computer interactions. For example, a machine might be trained to assess the quality of a lecture or a movie by reading the facial expressions of the audience; seeing many happy faces might suggest the event is interesting, while recognizing bored expressions might suggest the opposite. Facial expression recognition also finds application in domains like video summarization, effective indexing of videos and finding lower dimensional encodings of facial expressions\cite{why_detect}. Medical researchers use expression recognition device to provide therapy to children and adults with Autism.  
 
-The domain of facial expression recognition has been shaped greatly by social and psychological research on emotional states. The "universality studies" were a series of experiments in the early '70s that aimed to determine whether or not facial expressions are culture-specific. For example, a study showed the same images of emotional expressions of Americans to people from the United States, Brazil, Chile, Argentina, and Japan, and asked participants to guess the emotion. The researchers expected that expressions for emotions such as "anger" might be confused with other negative expressions, such as those for "disgust" or "fear". However, regardless of what country the participants were from, people were very good at recognizing emotions accurately. The consensus across all of the universality studies was that facial expressions are indeed universally recognizable \cite{universality_studies}. More recently, Elfenbein and Ambady published a meta-analysis of 168 studies (including the universality studies) that confirmed emotion recognition of the basic emotions is likely universal \cite{universality}.
-
-These studies provide strong foundations for the domain of facial expression recognition. We know that humans are capable of reliably recognizing basic emotions, and we know that the majority of those signals aren't too culture-specific. So, it's likely that the signals come from the physical facial features.
-
-% facial expression domain-specific
-FACS, FACS AU detection, EMFACS, 
-
+Facial expression recognition aims to automatically determine the emotional state of a person based on an image of their face. The established "basic emotions" to choose from include happiness, sadness, anger, fear, disgust, surprise, or neutral. Within the field there are slight variations on this set of emotions. 
 
 \section{Related Work} 
-% This section discusses relevant literature for your project
-Since our project domain was so broad, we 
+The domain of facial expression recognition has been shaped greatly by social and psychological research on emotional states. The "universality studies" were a series of experiments in the early '70s that aimed to determine whether or not facial expressions are culture-specific. For example, a study showed the same images of emotional expressions of Americans to people from the United States, Brazil, Chile, Argentina, and Japan, and asked participants to guess the emotion. The researchers expected that expressions for emotions such as "anger" might be confused with other negative expressions, such as those for "disgust" or "fear". However, regardless of what country the participants were from, people were very good at recognizing emotions accurately. The consensus across all of the universality studies was that facial expressions are indeed universally recognizable \cite{universality_studies}. More recently in 2002, Elfenbein and Ambady published a meta-analysis of 168 studies (including the universality studies) that confirmed emotion recognition of the basic emotions is likely universal \cite{universality}.
 
+These studies provide strong foundations for the domain of facial expression recognition. We know that humans are capable of reliably recognizing basic emotions, and we know that the majority of those signals aren't too culture-specific. So, it's likely that the signals come from the physical facial features. In psychology, there are two main ways of framing the facial expression problem: message judgement or sign judgment. For message judgment, the underlying emotions of a person is treated as the hidden state that caused a particular combination of facial features. Contrastingly, signal judgment treats the facial movements as the hidden state, and aims to discover which facial movements result in which expressions. For example, if the observation is a frown, it may have been caused by a combination of facial movements which result in the corners of your mouth turning downwards \cite{metastudy}.
 
-\subsection{Data Processing Techniques}
-% previous study comparing ROI vs full face
+The effects of different lighting conditions or illumination effects in images have on expression regression is studied in this paper \cite{FERvariablelighting}.They build a pipeline of pre-processing steps aimed at nullifying the effects of illumination on images.Illumination effects contribute much more to image variation than facial features and impact expression recognition significantly.Their pipeline consists of identifying and extracting facial regions from images using the Viola-Jones Haar Cascade Method implemented in OpenCV followed by gamma correction to improve contrast and sharpen edges in an image, sharpening regions around eyes and mouth and contrast equalization. The resulting images are subject to a SIFT key point detection test where given a test image,either poor lighting or high lighting conditions are added and put through the pipeline. The number of matching SIFT key points between the test image and result image divided by total number of SIFT key points in the test image are computed as a performance measure of the pipeline. The classification accuracies on fisher faces of BU-4DFE data set under different illumination effects have significantly improved with pre processing .    
 
-\subsection{Feature Extraction Techniques}
-% previous studies for:
-% 'pixel', 'pixel_sharpen', 'pixel_gradient'
+Using Gabor filter bank features for expression recognition is proposed in the paper \cite{VisualcuesFER}. Their pipeline includes obtaining a bank of gabor filter features followed by adaboost dimensionality reduction and an SVM classifier. On CK dataset, they have obtained accuracies of 94.72\% . They also show experiments with different dimensionality reduction techniques and classifiers used.
 
-% 'hog'
+Using around 34 fiducial points,extracting a bank of gabor filter features at the points and training a two layer neural network on the input features has given test accuracies upto 90\% on JAFFE dataset. This paper \cite{FERfeaturebased} also studies the effects different fiducial points on a face have on the classification accuracy. They conclude that the least effectful points are located on forehead and cheeks. They also choose to use the first layer of neural network as dimensionality reduction tool than PCA or some other unsupervised mechanism.   
 
-% 'lbp' 
+The Facial Action Coding System (FACS) catalogs associations between observed changes in expression and unseen changes in facial musculature; an implementation of signal judgment concepts. An "action unit" (AU) is defined as something--usually a specific muscle--that is responsible for an "action". For example, AU $10$ is defined as the "Upper Lip Raiser" and is associated with the \textit{levator labii superioris} and \textit{caput infraorbitalis} muscles. Action units are mostly facial changes, but also include head and eye movements like "Head Tilt Right" and "Cross-eye", as well as some gross behaviors like "Shoulder Shrug". By combining these low-level AUs, one is able to sufficiently encode complex expressions, including the basic emotions. The Emotional Facial Action Coding System (EMFACS) collects FACS related to emotions; in EMFACS, "Happiness" is encoded as AU 6 + AU 12. By annotating an image of unknown emotional affect with FACS action units, one can attempt to decode the emotion using EMFACS. Another reason FACS and EMFACS are important tools in this field is that they greatly reduce the dimensions of the problem \cite{metastudy}. Thus, many modern researchers seeking to solve the emotion recognition problem use FACS and/or EMFACS.
 
-% 'gabor'
-
-% 'soft_clustering', 
-
-% 'edge_features' 
-
-% 'fiducial_points'
-
-\subsection{Dimensionality Reduction Techniques}
-% PCA
-% NMF
-
-% when to use, when not to use
-% expectations
-
-\subsection{Classifiers}
-% give a good example of each, express expectations we have for our results
-
-% decision tree
-
-% KNN
-
-% SVM
-
-% adaboost
-
-% cluster template matching
-
-% HCRF
-
-% neural nets, ensemble
-
-\section{Approach}
-% Approach: This section details the framework of your project. Be specific, which means you might want to include equations, figures, plots, etc
-
-% motivate model pipeline style
+\section{Methods}
 We wanted to understand, at a high level, what combinations of pre-processing, feature extraction, dimensionality reduction, and modeling techniques result in the best expression classifiers. Our approach was to build a pipeline with a variety of modular feature extraction and modeling functions, such that we could easily try many models. We took the most promising models, based on test set prediction accuracies, and tuned them. 
 
 % motivate data usage
 We performed cross-database evaluation of our methods, using both the JAFFE and Cohn-Kanade datasets. The motivation for this was two-fold; we wanted to corroborate our results as well as explore the effects of using different datasets for emotion recognition. In the experiment from the universality studies mentioned previously, not all emotions were recognized with equal agreement. For example, images depicting happiness had $95-100\%$ agreement across cultures, while images depicting fear and sadness had between $62-85\%$ agreement \cite{universality_studies}. The variability in emotion recognition might be explained in part by "in-group advantage". In-group advantage, in the context of facial expression recognition, describes the improved ability to accurately label emotions expressed by a person of your own ethnic group \cite{universality}. Often, people within an ethnic group have similar physical traits, which may contribute to the in-group advantage. We wondered if training on a more homogeneous set of facial images would improve the ability of classifiers to pick up on clear signals.
 
-%TODO : add all external packages here + then cite them
 Our implementation is written in Matlab, and requires the Image Processing, Fuzzy Logic, and the Neural Networks Toolbox. External packages include the Matlab Toolbox for Dimensionality reduction \cite{drtoolbox}.
 
-\subsection{Preprocessing}
-Pre-processing stage involves steps taken to make the classification invariant to scaling, translation or rotation
-
-% aligning images using "similarity" transformation and landmarks, 
-% cropping
-% show result of align + crop for both datasets
-
-An optional pre-processing step is to extract ROIs. 
-Finding regions of interest
-% show result of ROI
-
-\subsection{Feature Extraction}
-% describe the implementations of feature extraction techniques
-%  'pixel', 'pixel_norm1', 'pixel_norm2', 'pixel_sharpen', 'pixel_sharpen_norm1', 'pixel_sharpen_norm2',
-%  'pixel_gradient', 'pixel_gradient_norm1', 'pixel_gradient_norm2', 'hog', 'hog_norm1', 'hog_norm2', 
-%  'lbp', 'lbp_norm1', 'lbp_norm2', 'lbp2', 'gabor', 'gabor_norm1', 'gabor_norm2', 'soft_clustering', 
-% 'soft_clustering_norm1', 'soft_clustering_norm2', 'edge_features', 'edge_features_n1', 
-% 'edge_features_n2', 'fiducial_points', 'fiducial_points_n1'
-
-\subsection{Classification}
-
-% feature selection / dim reduction
-dimensionality reduction to check or reduce computational complexity and overfitting
-PCA, NMF
-
-% train/test split
-
-% classifiers
-Decision Tree
-K-Nearest Neighbors (KNN)
-Support Vector Machine (SVM)
-Neural Network
-ensemble Neural Network
-Adaboost
-Cluster matching template
-HCRF
-
-
-\section{Experiments} 
-% This section begins with what kind of experiments you're doing, what kind of dataset(s) you're using, and what is the way you measure or evaluate your results. It then shows in details the results of your experiments. By details, we mean both quantitative evaluations (show numbers, figures, tables, etc) as well as qualitative results (show images, example results, etc).
-
 \subsection{Data}
-The Version 1 of the Cohn-Kanade AU-Coded Facial Expression Database \cite{ck} includes 487 sequences from 97 individuals, who were asked to make facial expressions for the basic emotions. A sequence, which is typically comprised of about 20 photographs, begins with a neutral expression and peaks at an emotional expression. The peak image is not necessarily the last one of the sequence. For each sequence, only the image corresponding to the peak expression is annotated with FACS and labeled with the emotion.
+\paragraph{}
+\textbf{JAFFE dataset}: The database \cite{jaffe} contains 213 images of 7 facial expressions (6 basic facial expressions and 1 neutral) posed by 10 Japanese female models. Each image has been rated on 6 emotion adjectives by 60 Japanese subjects. The images are of dimensions 256x256, the 7 facial expressions are ‘Anger’, ’Disgust’, ’Fear’, ’Happy’, ’Sad’ , ’Surprise’ and ‘Neutral’.  The annotations are embedded into the file names and we have used Matlab Code to extract them as labels. Here are some examples of cropped images $180\times117$ collated from each emotion in Figure \ref{fig:jaffe_examples}
 
+\begin{figure}[h]
+\includegraphics[width=8cm]{figs/jaffe_examples.PNG}
+\caption{Jaffe dataset examples}
+\label{fig:jaffe_examples}
+\end{figure}
 
-We used the CIFAR-10 dataset, which consists of $60,000$ images evenly distributed into 10 classes (airplane, automobile, bird, cat, deer, dog, frog, horse, ship, truck). Each $32 \times 32 \times 3$ pixel image is represented by the RGB color model, so it has 3 channels. We will remove a $16 \times 16$ region of each image, and consider the original image to be the original distribution of $32 \times 32 \times 3 = 3,072$ dimensions. All images have normalized pixel intensities. \\
+What makes the task of expression recognition harder is that different people experience emotions at different intensities and express them differently. Free movement of facial muscles is hindered by certain surgical operations like botox, and it becomes hard to identify emotion from the images of people that undergo such procedures. Addtionally, natural expressions vary from orchestrated expressions. From the example above, we can see how the neutral image looks so much similar to a happy expression, and the image for disgust could also be interpreted as a sad expression.
 
-This is what our incomplete images look like after we remove the center pixels.\\
-%\includegraphics[width=1.0\linewidth]{img_sample.png}
+\textbf{Cohn-Kanade dataset}: Version 1 of the Cohn-Kanade AU-Coded Facial Expression Database \cite{ck} includes 487 sequences from 97 individuals, who were asked to make facial expressions for the basic emotions: "Angry", "Contempt", "Disgust", "Fear", "Happiness", "Sadness", "Surprise". A sequence, which is typically comprised of about 20 photographs, begins with a "Neutral" expression and peaks at an emotional expression. The peak image is not necessarily the last one of the sequence. For each sequence, only the image corresponding to the peak expression is annotated with FACS and labeled with the emotion. Additionally, coordinates for facial landmarks such as "left eye" are given for labeled images. Version 2 includes more annotated sequences from more individuals. We combined Version 1 and Version 2 for our model dataset, only using the 327 labeled images. The annotations are stored in a hierarchical format that matches the storage of the images. We used Matlab to correctly extract annotations. The images are of mixed dimensions; color images can be $480\times640$ or $480\times720$, while black and white images are $480\times640$. Some examples are shown in Figure \ref{fig:ck_examples}
 
+\begin{figure}[h]
+\includegraphics[width=8cm]{figs/ck_emotions.png}
+\caption{Cohn-Kanade dataset examples. Top row, from left to right: Neutral, Angry, Contempt, Disgust. Bottom row, from left to right: Fear, Happiness, Sadness, Surprise.}
+\label{fig:ck_examples}
+\end{figure}
 
+\subsection{Data Processing Techniques}
+For both datasets, we wanted to experiment on images of full faces as well as extracted regions of interest (ROIs). We originally expected to implement facial detection; since our images all had only one centralized face, our pre-processing steps were simply to align and crop images, and then to extract ROIs.
 
-\subsection{Setup}
-%% how much in train and test set
-%% what combinations of processing, feature extraction, etc were applied and what reasoning?
-%% what combinations were avoided?
+\paragraph{}
+\textbf{
+JAFFE Dataset}: The original images from the dataset had a lot of background noise, which gave poor classification performance of around 12-20\% accuracy with SVM using pixel intensities as features. We cropped the images to $180\times117$ dimensions, forcing only the face into the image and setting a distance of 55 pixels between the eyes. 
+\par
+We tried extracting certain regions of interest from the images like areas around eyes, lip corners, cheeks which play a more important role in identification of expression.Figure \ref{fig:jaffe_roi_examples} is an example of a cropped face image and the ROIs extracted from it.
 
-\subsection{Results}
-Table 1 shows the prediction accuracy on a test set for each model.
-\begin{table}[!ht]
-\centering
-\caption{Each of 3 human judges saw 10 samples each, totaling 30 total samples for each model}
-\begin{tabular}{lll}
-\hline
-Model               & Test RMSE & \# Convincing samples \\ \hline
-CNN with Regression & 24.468    &  4                     \\
-Pixel RNN w Sigmoid &   -       &  -                     \\
-Pixel RNN w Softmax &   -       &  10                     \\
-Pixel CNN           &   -       &  -                     \\ \hline
-\end{tabular}
-\end{table}
+ \begin{figure}[h]
+\includegraphics[width=8cm]{figs/roi.PNG}
+\caption{JAFFE dataset example with ROI shown.}
+\label{fig:jaffe_roi_examples}
+\end{figure}
+
+\paragraph{}
+\subitem \textbf{
+CK+ Dataset}: The CK images needed to be aligned, especially since they were of differing dimensions. First, a reference image was selected. We picked 3 facial landmarks (left eye, right eye, chin) from a selected reference image, and used geometric transformation with similar triangles to warp all other images to match. Once the images were aligned, we cropped them to a size of $350\times350$, making our final cropped dataset $350\times350\times327$. 
+
+\subsection{Feature Extraction Techniques}
+\paragraph{}
+\textbf{
+Pixel intensities}: This method uses the raw pixel intensities of input images to describe the image. We have implemented it under the method called 'pixel'. Length normalization of these feature vectors can improve accuracies by removing the effects of illumination or shadowing, which we implemented as 'pixel norm1'. Replacing the intensity values with a square of the feature values is implemented as 'pixel norm2'.
+
+\paragraph{}
+\textbf{
+Pixel sharpening}: Input images are sharpened such that edges in an image are sharpened. The resulting image raw pixel intensities are used to represent the image, optionally as an image feature vector. We have used 'imsharpen()' from the Image Processing Toolbox, which allows us to control the amount of sharpening and the areas on a face where to apply this sharpening to. We found the optimal amount of sharpening is 0.8, with threshold 0.25.An example in Figure \ref{fig:sharp_image}
+
+\begin{figure}[h]
+\includegraphics[width=8cm]{figs/sharpen.PNG}
+\caption{Original image juxtaposed with sharpened image.}
+\label{fig:sharp_image}
+\end{figure}
+
+\paragraph{}
+\textbf{
+Pixel Gradients}: In this project, we have used raw pixel intensities of x-gradient of an image as its representation, raw pixel intensities of y-gradient of the image and the magnitude of x and y gradient of the input image as its representation and recorded the results.An example in Figure \ref{fig:grad_image}
+
+\begin{figure}[h]
+\includegraphics[width=8cm]{figs/pixel_gradient.jpg}
+\caption{Original image juxtaposed with pixel gradient.}
+\label{fig:grad_image}
+\end{figure}
+
+\paragraph{}
+\textbf{Pixel Edge features}: Edges in a given image are identified using a sophisticated 'canny' edge detector or a more simpler 'sobel' edge detector. The raw pixel intensity values of the resulting image as used as features. An example of a 'canny' edge detector output is shown in figure \ref{fig:edge_image}.
+
+\begin{figure}[h]
+\includegraphics[width=8cm]{figs/im_edge.png}
+\caption{Edge feature representation of a face}
+\label{fig:edge_image}
+\end{figure}
+
+\paragraph{}
+\textbf{Fiducial points}: We have identified several key points on the input face and extracted a set of gabor filter values at those points, concatenated them to obtain the full image representation.  An example of an input image with fiducial point locations marked with an 'x' on it. There are total 94 of the points as shown in the image. WE have focused on extracting features around eyes,along eye brows, around nose and lip corners, some on forehead and chin area, a few on cheeks. Research has shown that the points on cheeks and forehead seem to have least impact on the classification accuracy.So we have decided to limit ourselves to very few points in these areas of a face.An example shown in Figure \ref{fig:fid_image}.  
+
+\begin{figure}[h]
+\includegraphics[width=8cm]{figs/im_fid.PNG}
+\caption{Original image and with fiducial points on it.}
+\label{fig:fid_image}
+\end{figure}
+
+ \paragraph{}
+\textbf{HOG features(Histogram of oriented gradients)}: The technique counts occurrences of gradient orientation in localized portions of an image, using overlapping local contrast normalization for improved accuracy. The idea behind the HOG descriptor is that local object appearance and shape within an image can be described by the distribution of intensity gradients or edge directions. The image is divided into small connected regions called cells, and for the pixels within each cell, a histogram of gradient directions is calculated. The descriptor is the concatenation of these histograms. For improved accuracy, the local histograms can be contrast-normalized by calculating a measure of the intensity across a larger region of the image, called a block, and then using this value to normalize all cells within the block. This normalization results in better invariance to changes in illumination and shadowing.An example shown in Figure \ref{fig:hog_image}
+
+\begin{figure}[h]
+\includegraphics[width=8cm]{figs/HOG2.png}
+\caption{HOG representation of a face.}
+\label{fig:hog_image}
+\end{figure}
+
+\paragraph{}
+\textbf{LBP features(Local Binary Patterns)}: These are special kind of visual descriptors that work well with texture classification and recognition tasks. Multiple variants for compiling these features appear in literature like breaking an image into blocks and extracting local histograms from each of the blocks and concatenating them or extracting a single histogram for the full image and finally implementing it as a "bag of words" representation where the final representation of the image reflects how many histograms of a particular type exist in the given  image. 
+
+\paragraph{}
+\textbf{Gabor filters}: The characteristics of certain cells in the visual cortex of some mammals can be approximated by these filters, which can be viewed as a sinusoidal plane of particular frequency and orientation, modulated by a Gaussian envelope. They have been found to be particularly appropriate for texture representation and discrimination. The convolution of Gabor fillters is done by computing the Fourier transform of the image and multiplying with the Fourier transform of the Gabor filter in the frequency domain. This aids in reducing computation time. Since they have are used in fingerprint recognition to enhance the fingerprint features, we thought it might help enhance minute facial features as well. An example in Figure \ref{fig:gabor_image}
+
+\begin{figure}[h]
+\includegraphics[width=8cm]{figs/gaboorv2.PNG}
+\caption{A sample of gabor filters applied to a human face.}
+\label{fig:gabor_image}
+\end{figure}
+\paragraph{}
+
+\textbf{Soft clustering}: We have congregated the input data into 7 clusters through a fuzzy clustering mechanism where each point has membership within all the resulting clusters with a degree of membership that determines the extent of its belonging to that cluster, instead of strictly belonging to a single cluster. For each pixel in an image, we identified the centroids of the resulting clusters and represented an image with concatenation of its membership value to a cluster, followed by the euclidean distance between the data point and cluster center. This results in a high dimensional feature vector whose dimensions must be reduced using one of the dimensionality reduction techniques. We implemented a squared version of soft clustering, where instead of using an euclidean distance during the concatenation step, we take the square of euclidean distance. This has been reported to produce better results in several image segmentation tasks.
+
+\paragraph{}
+
+\subsection{Dimensionality Reduction Techniques}
+\paragraph{}
+\textbf{PCA}:PCA or Principal Component Analysis reduces the dimensions of feature space through Singular Value Decomposition (SVD), learns a basis, and represents each input vector as a sum of the basis elements, in a lower dimension. It only retains the k most prominent eigenvectors, along which the input data has highest variance. 
+
+\paragraph{}
+\textbf{NMF}: This is a dimensionality reduction mechanism that factors a nonnegative $N \times M$ matrix $A$ into non-negative factors $W(N \times K$) and a basis or a dictionary $H(K \times M)$.  $W*H$ is a lower-rank approximation to $A$ and the factors $W$ and $H$ are chosen to minimize the root-mean-squared residual difference between $A$ and $W*H$. The factorization uses an iterative method called 'alternative least squares' starting with random initial values for $W$ and $H$. The main difference with PCA lies with the fact that the factors are non-negative and for the task of facial expression recognition this could translate into a basis $H$ that contains parts of different faces from the input data like eyes, nose, or ears.
+
+\paragraph{}
+\textbf{t-SNE}:This involves a dimensionality reduction mechanism where higher dimensional vectors are transformed into lower dimensions while retaining the distances between those points intact. This provides a very helpful tool for visualization of data. We used an implementation of t-SNE from the github package called 'Dimensionality Reduction Toolbox' \cite{drtoolbox}. The t-SNE representation for pixel sharpened features is provided in Figure \ref{fig:tsne}. Data points of a certain class are all represented with a certain color. 
+
+\begin{figure}[h]
+\includegraphics[width=8cm]{figs/tsne.PNG}
+\caption{t-SNE representation of pixel sharpened features.}
+\label{fig:tsne}
+\end{figure}
+
+\subsection{Classifiers}
+\paragraph{}
+\textbf{K-Nearest Neighbors}: This is a non-parametric classifier that stores all of its training data in memory which makes its training time to be almost negligible. It matches a given test sample to each of the stored data point through Euclidean or Minkowski distance metric and uses the vote of $k$ nearest neighbors to assess the class label of that point. Here, $k$ is the hyper parameter. This is very susceptible to noise in the input data and suffers from the curse of high dimensionality.
+
+\paragraph{}
+\textbf{SVM (Support Vector Machines)}: SVM is a linear classifier that finds a maximum margin hyperplane separating two classes when they are linearly separable. If they are not linearly separable, it implicitly translates them into a higher dimensional space and finds a most fitting linear hyperplane which has non-linear boundary shape in the original space. SVMs take a significant amount of time to train (depending on the number of input dimensions) and testing also takes a significant amount of time. They perform poorly if input data contains lot of noise. Emotion recognition here is framed as a multi-class classification problem where a data point is to be classified as one of the many classes. Our implementation was with SVM in a one-versus-rest mode, where there are multiple binary learners trained one for each class predicting if the given data point belongs to it or not.
+
+\paragraph{}
+\textbf{Decision Trees}: This is a classifier that gives a piece-wise linear decision boundaries that are parallel to axes or dimensions of input data. It builds a tree from the input features by picking a feature which gives a maximum reduction in  entropy value or a maximum increase in gini index or information gain.This is a recursive process and stops when a maximum depth is reached or all the data points in a leaf belong to the same class label. Decision trees are known to be more robust to noise in the input and certain techniques like pruning can control over fitting when number of training examples is small. It also seems to do well with high dimensional data.
+
+\paragraph{}
+\textbf{Neural Networks}: Neural networks are typically organized in layers that replicate layers of neurons in human brain. Layers are made up of a number of interconnected 'nodes' which contain an 'activation function'. Patterns are presented to the network via the 'input layer', which communicates to one or more 'hidden layers' where the actual processing is done via a system of weighted 'connections'. These classifiers with number of layers greater than or equal to 2 can represent any arbitrary function in the universe. We used a two-layer neural network classifier with hidden units of dimension $[50, 10]$.
+
+The second generation architecture to neural networks are convolutional neural networks, which are very powerful tools in the domain of image recognition, but require more data than we had for decent performance. They require lots of training data to prevent over fitting or offset the complexity of their model. So, we used a fully connected network. Neural networks can also be combined into ensembles. We used an ensemble of 2 neural networks with hidden dimensions $[60,10]$. These hidden unit dimensions were picked after manual hyperparameter tuning, during which we discovered that lower numbers of units produced poorer accuracy results.
+
+\section{Experiments \& Results} 
+For all classifiers, we shuffled the datasets using the same random seed. Then, we divided the datasets into $80\%$ -$20\%$ training and testing sets. For JAFFE, we had 170 images for training and 43 used to test the learned model. For Cohn-Kanade, we had 261 train images and 66 test images.
+
+%%%%% JAFFE CROPPED IMAGES: features vs accuracy, color = classifier
+On cropped full-face JAFFE images, we have tried raw pixel intensities, sharpened pixel intensities, gradient magnitude, x-gradient, y-gradient intensities, HOG and LBP features with normalization options and recorded the results as shown in Figure \ref{fig:testacc1}. 
+
+In a line plot graph,
+\begin{figure}[h]
+\includegraphics[width=8cm]{figs/testAcc11.PNG}
+\caption{Test accuracies of cropped images with differnt features and classifiers.}
+\label{fig:testacc1}
+\end{figure}
+
+SVM outperforms the other classifiers with all the features except LBP and Gabor filters and the best performance is achieved with pixel sharpening which happens to emphasize the features on a face that aid in expression recognition like lip corners, eye brows etc.
+
+In addition to the features above, we've also extracted the following from our cropped, full-face JAFFE images: fiducial points, gabor filter v2, soft clustering, soft clustering with normalization, soft clustering with norm2, soft clustering squared, soft clustering squared with normalization, lbp v2, and the results are shared in Figure \ref{fig:testacc3}. 
+
+\begin{figure}[h]
+\includegraphics[width=8cm]{figs/testAcc33.png}
+\caption{Test accuracies of cropped images with different features and classifiers.}
+\label{fig:testacc3}
+\end{figure}
+
+Again, SVM performs better than the rest except with LBPv2 features. The highest accuracy achieved was 93\% using fiducial points. All the soft clustering results performed well too, with accuracies falling in the ranges of 70-80\%.
+
+We extracted raw pixels with norm1, HOG, HOG with norm 1, HOG with norm 2, LBP, gabor, gabor with norm 1, pixel sharpening, and pixel sharpening with norm1 from the CK cropped, full-face dataset. The accuracies are given for the model with the best dimensionality reduction technique, if there was one.
+
+\begin{figure}[h]
+\includegraphics[width=8cm]{figs/first_features.png}
+\caption{Test accuracies of full-face CK images with first set of features, by classifier.}
+\label{fig:testck1}
+\end{figure}
+
+We also extracted fiducial points, fiducial points with norm1, soft clusting, soft clusting with both normalization techniques, raw pixel values, as well as pixel gradients from the CK cropped, full-face dataset.
+
+\begin{figure}[h]
+\includegraphics[width=8cm]{figs/second_features.png}
+\caption{Test accuracies of full-face CK images with second set of features, by classifier.}
+\label{fig:testck2}
+\end{figure}
+
+Similarly to the results from JAFFE, SVM outperforms the other classifiers, except where it comes to predicting on extracted gabor filters. In some cases, such as with raw pixel values, LBP, and soft clustering, SVM does not do that much better than Decision Tree (DT). In other cases, such as with HOG normalized 2 and fiducial points, KNN has comparable performance to SVM, which generally takes much longer to train. We can see generally that LBP boosts the performance across classifiers, suggesting that it might be a good "out of the box" feature to try in the future, when uncertain about selecting a feature extraction technique. It seems that gabor filters and soft cluster are less useful on the full-face dataset. Considering that the past research that successfully uses gabor filters applied them on ROIs, this result is not too surprising.
+
+%%%% JAFFE ROI: features vs accuracy, color = classifier
+We also collected accuracies for models using ROIs extracted from JAFFE images, rather than the cropped full-face image. 
+\begin{figure}[h]
+\includegraphics[width=8cm]{figs/testAcc22.PNG}
+\caption{Test accuracies of ROI images with different features and classifiers.}
+\label{fig:testacc2}
+\end{figure}
+
+As can be seen from the plots in Figure \ref{fig:testacc2}, SVM outperforms the other classifiers and the over all performance matches or is consistently better than the full image accuracy values although the performance with LBP features is very low. The best accuracy value is 91\% with sharpened pixel intensities and least 44\% with LBP features. 
+
+%%%%%%%%%% all NN results
+For neural nets and ensembles, the performance is no comparison to the accuracies we saw with SVM on JAFFE. However, in some cases it reaches to a close proximity of SVM performance on the same feature inputs. Table 1 below shows the performance values.
+
+\begin{figure}[h]
+\includegraphics[width=8cm]{figs/table1.PNG}
+\label{fig:testacc4}
+\end{figure}
+%\begin{table}[h]
+%
+%\caption{Neural Net and Ensemble neural net performance on certain features.}
+%\begin{tabular}{ll1}
+%\hline
+%Features               & Neural Net & EnsemNet \\\hline
+% Img,Gaborv2,PCA100  & 0.77    &  0.67                     \\
+% 0.5Im,Gaborv2,PCA25 &   0.80       &  0.63                     \\
+% Fiducial Points  &   0.89       &  0.73                     \\
+% Edge features           &   0.15       &  0.18     \\ 
+% ROI,Gaborv2 & 0.75 &0.65 \\\hline
+% \end{tabular}
+% \label{tab:testacc4}
+%\end{table}
+
+Gabor v2: We tried to convolve gabor filters of wavelengths [2,4,8] and orientations [0,45,90] resulting in 9 outputs per image which are flattened into a list and concatenated to form a large vector representation of the image. We are able to see the highest accuracy value of $95\%$ with PCA 50.
+On ROI image features also, SVM gave an output of 95\% ,DT 45\% ,KNN 67\% accuracies.  
+
+\par
+We tried reducing the input image size by scaling it to $50\%$ original size and convolving with gabor filters of wavelengths [2,4,8] and orientations [0.30.45.60.90] and concatenated the resulting convolved magnitudes. Since the resulting dimensions are so high and that could make a classifier complexity increase or overfit , we reduced the dimensionality using PCA and casting the high dimensional input vectors into different lower dimensions and recorded the results show SVM 88\%, DT 53\% and KNN 65\% with PCA of 50.
+
+\begin{figure}[h]
+\centerline{\includegraphics[width=8cm]{figs/fullImage_gaborv2_pca.png}}
+\caption{Test Accuracies of GaborV2PCA features across classifiers.}
+\label{fig:testacc5}
+\end{figure}
+
+We have concatenated gabor v2 results on full images with orientations [0 45 90] and sharpened images which gave the best accuracy values in previous trials. Reducing the number of dimensions using PCA to 50, KNN showed 63\%, Decision trees 45\% and SVM 95\% which is the same as with gaborv2 alone.Neural network has given a good accuracy value of 65\% .Results of PCA number of components on accuracy values over the classifiers is shown in Figure \ref{fig:testacc5}.
 
 \section{Conclusion}
-% Conclusion: What have you learned? Suggest future ideas.
-%TODO : come up with high level conclusions
-%TODO : future ideas
+We see that with JAFFE dataset, several features perform well achieving high accuracies above 90\%. Features extracted from region of interest images perform just as good as the same features extracted from full images and this is significant because with low dimensionality representation of an image we can have faster training time, lower model complexity, a decreased need for lots of training data and efficient memory utilization. We didn't get the same performance on full face images from the CK dataset as we did with JAFFE, despite having more images to train on. This might have something to do with the increased variation in CK images. Neural networks after several attempts at tuning for number of layers and hidden dimensions have failed to outperform or perform as well as SVM has done on all the features for JAFFE images. \\
 
+Our best pipeline for JAFFE images is using cropped full images or ROI images for extraction of gaborv2 features followed by a PCA to 50 dimensions and SVM classifier. This gives us an accuracy value of above 95\%. The second best feature extraction methods are fiducial points and sharpened image pixel intensities which produced 93\% accuracy values on both fully cropped and around 91\% on ROI images. 
+
+Our best pipeline for CK images is using cropped full images for extraction of fiducial points, with no dimensionality reduction, giving an accuracy of 75\%. The second best pipeline actually simply extracted sharpened pixel values, performed no dimensionality reduction, and classified with SVM, giving 71\% accuracy. We think that the low accuracy values in the case CK dataset are due to the effects of skin color which might be akin to illumination effects in images addressed in \cite{FERvariablelighting}.Building a similar pipeline before our feature extraction techniques could improve on the accuracy drastically we think. Also for the JAFFE dataset, we could try localized sharpening of eyes and lip regions before feature extraction to see if that improved our accuracy further. Convolutional neural networks which perform extremely well on image classification cannot be leveraged for expression recognition due to insufficient annotated data in this domain. Over fitting in convolutional neural networks cannot be mitigated unless there is plenty of training data. But several studies in natural language processing \cite{nigam2006} have found techniques to merge labeled and unlabeled data and use effience EM algorithms for improving accuracies. This could be something to be leveraged upon in future in the field of expression recognition as well.
+
+We have also noticed that the number of mis-classifications is more in the case of 'Neutral', 'Disgust' and 'Fear' classes leading us to think that the annotations themselves are not very accurate in labeling contributing towards label noise. We could address such issues by reducing the number of class labels in the dataset restraining in the process to only accurately labeled or  noise-free expression classes.\\
 
 \begin{thebibliography}{1}
 % datasets
@@ -198,11 +305,20 @@ Pixel CNN           &   -       &  -                     \\ \hline
 \bibitem{universality_studies} chapt 4 Facial Expression
 
 % papers
+\bibitem{nigam2006}Text classification from labeled and unlabeled documents using EM. Nigam Kamal and McCallum  Andrew Kachites and Thrun Sebastian and Mitchell Tom.
+\bibitem{why_detect} What is the Value of Embedding Artificial Emotional Prosody in Human–Computer Interactions? Implications for Theory and Design in Psychological Science. 
+\bibitem{cnn_au} Do Deep Neural Networks Learn Facial Action Units When Doing Expression Recognition?
 \bibitem{metastudy} Meta-Analyis of the First Facial Expression Recognition Challenge. 2002. Valstar et al.
 \bibitem{universality} Elfenbein, H. A., \& Ambady, N. (2002a). On the universality and cultural specificity of emotion recognition: A meta-analysis. Psychological Bulletin, 128(2), 205-235. 
 \bibitem{preprocess} Preprocessing of Face Images: Detection of Features and Pose. 1998. D Reisfeld and Yehezkel Yshurun.
 \bibitem{committeeNN} Facial expression (mood) recognition from facial images using committee neural networks. Saket S Kulkarni, Narender P Reddy and SI Hariharan
 \bibitem{tutorial} Facial Expression Recognition: A Brief Tutorial Overview. Claude C. Chibelushi, Fabrice Bourel.
+\bibitem{smallsampleFER}Learning From Examples in the Small Sample Case:Face Expression Recognition.Guo Guodong ,Charles R. Dyer.
+\bibitem{VisualcuesFER}Facial Expression Classification using Visual Cues and Language. Abhishek Kar
+\bibitem{FERfeaturebased}Feature-Based Facial Expression Recognition: Sensitivity Analysis and ExperimentsWith a Multi-Layer Perceptron. Zhengyou Zhang
+
+\bibitem{FERvariablelighting}Image Processing Pipeline for Facial Expression Recognition under Variable Lighting.Ralph Ma, Amr Mohamed.
+
 \end{thebibliography}
 
 \end{document}
