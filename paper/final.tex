@@ -1,4 +1,4 @@
-	\documentclass[10pt,twocolumn,letterpaper]{article}
+\documentclass[10pt,twocolumn,letterpaper]{article}
 
 \usepackage{cvpr}
 \usepackage{times}
@@ -105,7 +105,7 @@ We wanted to understand, at a high level, what combinations of pre-processing, f
 We performed cross-database evaluation of our methods, using both the JAFFE and Cohn-Kanade datasets. The motivation for this was two-fold; we wanted to corroborate our results as well as explore the effects of using different datasets for emotion recognition. In the experiment from the universality studies mentioned previously, not all emotions were recognized with equal agreement. For example, images depicting happiness had $95-100\%$ agreement across cultures, while images depicting fear and sadness had between $62-85\%$ agreement \cite{universality_studies}. The variability in emotion recognition might be explained in part by "in-group advantage". In-group advantage, in the context of facial expression recognition, describes the improved ability to accurately label emotions expressed by a person of your own ethnic group \cite{universality}. Often, people within an ethnic group have similar physical traits, which may contribute to the in-group advantage. We wondered if training on a more homogeneous set of facial images would improve the ability of classifiers to pick up on clear signals.
 
 %TODO : add all external packages here + then cite them
-Our implementation is written in Matlab, and requires the Image Processing, Fuzzy Logic, and the Neural Networks Toolbox. External packages include 
+Our implementation is written in Matlab, and requires the Image Processing, Fuzzy Logic, and the Neural Networks Toolbox. External packages include the Matlab Toolbox for Dimensionality reduction \cite{drtoolbox}.
 
 \subsection{Preprocessing}
 Pre-processing stage involves steps taken to make the classification invariant to scaling, translation or rotation
@@ -165,7 +165,7 @@ This is what our incomplete images look like after we remove the center pixels.\
 %% what combinations were avoided?
 
 \subsection{Results}
-Table 1 shows the RMSE values for the models, as well as the number of samples deemed to be convincing by human judges. If the entry in the table is not filled, it means that our model never finished training to the point where we could generate samples.
+Table 1 shows the prediction accuracy on a test set for each model.
 \begin{table}[!ht]
 \centering
 \caption{Each of 3 human judges saw 10 samples each, totaling 30 total samples for each model}
@@ -181,6 +181,8 @@ Pixel CNN           &   -       &  -                     \\ \hline
 
 \section{Conclusion}
 % Conclusion: What have you learned? Suggest future ideas.
+%TODO : come up with high level conclusions
+%TODO : future ideas
 
 
 \begin{thebibliography}{1}
@@ -188,7 +190,9 @@ Pixel CNN           &   -       &  -                     \\ \hline
 \bibitem{ck} Comprehensive Database for Facial Expression Analysis. Kanade, Cohn, Tian.
 \bibitem{ck_extended} The Extended Cohn-Kanade Dataset (CK+): A complete dataset for action unit and emotion-specified expression.
 \bibitem{jaffe} MMI Facial Expression Database \url{http://mmifacedb.eu/}
+
 % git repos
+\bibitem{drtoolbox} Matlab Toolbox for Dimensionality Reduction \url{https://lvdmaaten.github.io/drtoolbox/}
 
 % chapter in book
 \bibitem{universality_studies} chapt 4 Facial Expression
@@ -196,11 +200,9 @@ Pixel CNN           &   -       &  -                     \\ \hline
 % papers
 \bibitem{metastudy} Meta-Analyis of the First Facial Expression Recognition Challenge. 2002. Valstar et al.
 \bibitem{universality} Elfenbein, H. A., \& Ambady, N. (2002a). On the universality and cultural specificity of emotion recognition: A meta-analysis. Psychological Bulletin, 128(2), 205-235. 
-
 \bibitem{preprocess} Preprocessing of Face Images: Detection of Features and Pose. 1998. D Reisfeld and Yehezkel Yshurun.
 \bibitem{committeeNN} Facial expression (mood) recognition from facial images using committee neural networks. Saket S Kulkarni, Narender P Reddy and SI Hariharan
 \bibitem{tutorial} Facial Expression Recognition: A Brief Tutorial Overview. Claude C. Chibelushi, Fabrice Bourel.
 \end{thebibliography}
-
 
 \end{document}

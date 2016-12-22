@@ -1,11 +1,12 @@
-function [trainIndices, testIndices] = trainTestNeuralNet(x_train,x_test,y_train,y_test, input, varargin)
+function [trainIndices, testIndices, accuracy] = trainTestNeuralNet(x_train,x_test,y_train,y_test, input, varargin)
 %% parse inputs -- default is jaffe dataset
 if length(varargin) == 0
     sprintf('* using %s *', 'jaffe')
-    [trainIndices, testIndices] = jaffe(x_train, x_test, y_train, y_test, input);
+    accuracy = 0;
+    [trainIndices, testIndices, accuracy] = jaffe(x_train, x_test, y_train, y_test, input);
 elseif length(varargin) == 1 && ~isempty(strmatch('ck', varargin{1}, 'exact'))
     %sprintf('* using %s *', 'cohn-kanade')
-    [trainIndices, testIndices] = ck(x_train, x_test, y_train, y_test, input);
+    [trainIndices, testIndices, accuracy] = ck(x_train, x_test, y_train, y_test, input);
 else
     sprintf('trainTestNeuralNet(x_train, x_test, y_train, y_test, input, *%s) \n    * optional param to use cohn-kanade', '"ck"')
 end 
@@ -54,7 +55,7 @@ fprintf('test set accuracy: %.2f\n',mean(testIndices==y_test));
 end
 
 %% for for cohn-kanade images
-function [trainIndices, testIndices] = ck(x_train, x_test, y_train, y_test, input)
+function [trainIndices, testIndices, accuracy] = ck(x_train, x_test, y_train, y_test, input)
 
 rng(0);
 if nargin<5
@@ -83,8 +84,8 @@ end
 pred_y=net(x_train);
 trainIndices = vec2ind(pred_y);
 ypred = cellstr(emotions(trainIndices));
-accuracy = sum(strcmp(ypred.', y_train.') / length(ypred)); 
-fprintf('train set accuracy: %.2f\n', accuracy);
+train_accuracy = sum(strcmp(ypred.', y_train.') / length(ypred)); 
+fprintf('train set accuracy: %.2f\n', train_accuracy);
 
 pred_y = net(x_test);
 testIndices = vec2ind(pred_y);

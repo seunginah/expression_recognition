@@ -29,29 +29,33 @@ ref_lmark = fscanf(ref_lmark_file, '%f', [2, 68])'; % [y coord, x coord]
 fclose(ref_lmark_file);
 
 % adjust ref_size to crop under the chin, and to the right of the ear
-crop_top = 100;
+crop_top = 50;
 crop_bottom = 400;
-crop_left = 100;
+crop_left = 200;
 crop_right = 550;
-% ref_crop = ref_im(1:crop_bottom, 1:crop_right);
-% imshow(ref_crop)
+ref_crop = ref_im(crop_top:crop_bottom, crop_left:crop_right);
+imshowpair(ref_im, ref_crop, 'montage')
 
 % build cropped dataset, simulataneously reading labels
 raw_data = zeros(crop_bottom - crop_top, crop_right - crop_left, length(emotion_paths));
 labels = cell(length(emotion_paths));
 label_count = 0;
+
+im_sizes = zeros(n, 3); % print out all the diff image sizes
 for i = 1:n
     %%% read, align, crop image
     im_path = im_paths{i};
     im = imread(im_path);
     im_size = size(im);
-    % imshowpair(ref_im, im, 'montage');
     
     % if color image, remap to b & w
     if length(im_size) == 3
+        im_sizes(i, :) = size(im);
         im = rgb2gray(im);
+    else
+        im_sizes(i, :) = [size(im) 0];
     end
-    
+
     % use this to look up Landmarks or Emotion labels
     l = length(im_path);
     im_name = im_path(l-4-16:l-4);
@@ -74,12 +78,7 @@ for i = 1:n
         
         est_trans = fitgeotrans(im_cpts, ref_cpts, 'similarity');
         im_align = imwarp(im, est_trans, 'OutputView', imref2d(size(im)));
-        
-        % crop excess from bottom and right side
-        im_crop = im_align(crop_top+1:crop_bottom, crop_left+1:crop_right);
-        %imshowpair(ref_im, im_crop);
-        raw_data(:, :, label_count) = im_crop;
-        
+
         % get label
         emo_path = emotion_paths{(contains(emotion_paths, im_name))};
         emo_file = fopen(emo_path, 'r');
@@ -87,8 +86,18 @@ for i = 1:n
         fprintf('(%d/%d) name: %s, emotion: %d\n', i, n, im_name, emotion_code);
         fclose(emo_file);
         
-        labels{label_count} = emotionIndexMap(emotion_code);
+        emotion = emotionIndexMap(emotion_code + 1);
+        labels{label_count} = emotion;
+        
+        % crop & save
+        im_crop = im_align(crop_top+1:crop_bottom, crop_left+1:crop_right);
+        imshowpair(im, im_crop);
+        imwrite(im_crop, strcat('../paper/figs/ck-samples/', im_name, '_', emotion, '.jpg'));        
+        raw_data(:, :, label_count) = im_crop;
+        
     end
 end
+
+unique(im_sizes, 'rows')
 
 end
